@@ -10,7 +10,7 @@ Used to make async http calls with inbuilt circuit breaker feature, uses aiohttp
 * Success/Fail/Exception Response will be provided to the client along with approprirate status code, message & response payload.
 
 ### Request format 
-GET HTTP Request Format   
+HTTP GET Request Format   
 `{
    'url':'http://127.0.0.1:8001/store_search?productid=1,
    'verb':'GET',
@@ -20,7 +20,7 @@ GET HTTP Request Format
 }`
       
 
-POST HTTP Request Format    
+HTTP POST Request Format    
 `{
    'url':'http://127.0.0.1:8001/store_add',
    'verb':'POST',
@@ -53,7 +53,7 @@ POST HTTP Request Format
 - DELETE
 
 #### Regex Pattern Examples
-* We are using python re library `search()` function to apply regex pattern to the string
+* We are using python re library [search()](https://docs.python.org/3/library/re.html#re.Pattern.search)  function to apply regex pattern to the string
 
  For Url : http://www.store1.com:8001/m_search?productId=11211
 
@@ -68,16 +68,9 @@ For Rest URLs : http://www.store1.com:8001/comment/postID/11211
 - `[w].+(?=)/` = `www.store1.com:8001/comment/postID/`
 - `.*` = `http://www.store1.com:8001/m_search?productId=11211`
 
-
-
-### Benefits over current Inbult Logging API
-* This will be the single library used across org, which maintains uniformity.  
-* Feature addition or changes will help reflect across project.
-* It also provides deatiled information related to File,Function and Line number from where the log was generated.
-* Action() method can log different events,actions with json payload.
-* All the action-logs JSON key-value pairs will be mapped to indexed in ELK and will be searchable. 
-* Action logs will be helpful for debugging, verifying data journery,tarce and pinpointing failure in code.
-* For ELK search SS and detail doc refer [Fynd-Logger]([https://gofynd.quip.com/WDZKAWndNLaP/Fynd-Logger])
+#### More :
+* [aiohttp](https://aiohttp.readthedocs.io/en/stable/) is used to make async http calls
+* [aopredis](https://aioredis.readthedocs.io/en/v1.2.0/index.html) is used to communicate with redis
 
 
 
