@@ -35,7 +35,8 @@ HTTP POST Request Format
 
 
 ###  Circuit Breaker (CB) Flow
-* Whenever Network/OS or Request time out exception occurs for more than MAX auto retry times, circuit will open for particular request url.
+* [WHAT is Circuit Breaker by. Martin Fowler.](https://martinfowler.com/bliki/CircuitBreaker.html)
+* Whenever Network/OS or Request time out exception occurs for more than MAX auto retry attempts, circuit will open for particular request url.
 * Client provided Regex is performed on requested url, this output is than used by CB to block all further calls to the same URI until cooling time elapses, current default cooling time is 10s
 * Url is stored in Redis for default 10s,all re calls made to same URI are blocked by CB and actual http request is not done.
 * After time elapses, URI is deleted from redis.
