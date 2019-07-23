@@ -9,6 +9,21 @@ Used to make async http calls with inbuilt circuit breaker feature, uses aiohttp
 * Auto retry attempts are done by library if any network/OS exceptions or request time occurs
 * Success/Fail/Exception Response will be provided to the client along with approprirate status code, message & response payload.
 
+### How To Use
+* Create instance of request builder library     
+`request_builder = RequestBuilder()`     
+* Design the http request payload as per below format     
+`http_get_request_payload = {
+   'url':'http://127.0.0.1:8001/store_search?productid=1,
+   'verb':'GET',
+   'cb_config':{
+      'regex_pattern':'[1].+(?=/)'
+   }
+}`    
+* Make a call to `make_client_request`  with payload as argument    
+`response = request_builder.make_client_request(http_get_request_payload)`
+
+
 ### Request format 
 HTTP GET Request Format   
 `{
