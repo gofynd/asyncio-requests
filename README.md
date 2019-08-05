@@ -19,34 +19,70 @@ Used to make async http calls with inbuilt circuit breaker feature, uses aiohttp
    'cb_config':{
       'regex_pattern':'[1].+(?=/)'
    }
-}`    
+}`
+
+
 * Make a call to `make_client_request`  with payload as argument    
 `response = request_builder.make_client_request(http_get_request_payload)`
 
 
 ### Request format 
-HTTP GET Request Format   
-`{
+HTTP GET Request Format:  
+```
+{
    'url':'http://127.0.0.1:8001/store_search?productid=1,
    'verb':'GET',
    'cb_config':{
       'regex_pattern':'[1].+(?=/)'
    }
-}`
+}
+```
       
-
-HTTP POST Request Format    
-`{
-   'url':'http://127.0.0.1:8001/store_add',
-   'verb':'POST',
-   'data':{
-      "name":"Kaushil"
-   },
-   'cb_config':{
-      'regex_pattern':''
+HTTP POST Request Format:    
+```
+{
+   'url': 'https://reqres.in/api/users/1', 
+   'verb': 'POST', 
+   "data" : {"name":"morpheus","job":"leader"},
+   'cb_config': {'regex_pattern': '[1].+(?=:)'}
    }
-}`
+```
 
+SOAP & XML Request Format:    
+```
+soap_xml='<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hs="http://www.holidaywebservice.com/HolidayService_v2/"><soapenv:Body><hs:GetHolidaysForMonth><hs:year>2019</hs:year><hs:countryCode>UnitedStates</hs:countryCode><hs:month>11</hs:month></hs:GetHolidaysForMonth></soapenv:Body></soapenv:Envelope>'
+http_get_request_payload = {
+   'url': 'http://www.holidaywebservice.com/HolidayService_v2/HolidayService2.asmx', 
+   'verb': 'POST',
+   'data':soap_xml,
+   'cb_config': {'regex_pattern': ".*"},
+   'headers':{'Content-Type':'text/xml'}, 
+   'log_request_metric': 1
+   }
+```
+
+### Log Request Metric
+If `log_request_metric` key is set and send along with request gives trace as below for the request     
+
+```
+  2019-08-05 22:12:07,975-fynd_logger.py-INFO-{
+ "app_ist_log_datetime": "2019-08-05 22:12:07.974752",           
+ "app_ist_log_timestamp": 1565023327.974799,           
+ "file_name": "/var/projects/fynd/fynd-request-builder/src/fynd_request_builder/request.py",           
+ "line_no": 217,           
+ "function_name": "add_requests_logs",           
+ "search_id": "f6699432-b79f-11e9-a13c-34415dc88eee",           
+ "search_term": "aiohttp_request_trace_metric",           
+ "action": "aiohttp_request_trace_metric",           
+ "status": "success",           
+ "payload": {"request_header": "[[\"X-Fynd-Trace-Id\",\"f6699432-b79f-11e9-a13c-34415dc88eee\"]]",       
+			 "connect": 427.02,         
+			 "transfer": 209.87,      
+			 "total": 637.59,      
+			 "is_redirect": false
+			}
+ }
+ ```  
 
 
 ###  Circuit Breaker (CB) Flow
