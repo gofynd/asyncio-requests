@@ -1,0 +1,2 @@
+HTTP_TIMEOUT = 15
+TIMEZONE = "Asia/Kolkata"

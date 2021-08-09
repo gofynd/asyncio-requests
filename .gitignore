@@ -1,0 +1,35 @@
+# Environments
+/env
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+.pytest_cache
+__init__.pyc
+.mypy_cache
+
+# Coverage: pytest, flake8
+.coverage
+/coverage
+/reports
+/artifacts
+/public
+flake8_index.txt
+bandit_index.html
+
+# Sublime Specific
+chronos-client.sublime-project
+chronos-client.sublime-workspace
+
+# Library Specific
+/build
+/dist
+/*.egg-info
+
+# Sphinx documentation
+docs/build/
+_static/
+_templates/
+*.rst
+
+# PyCharm Specific
+**/.idea
