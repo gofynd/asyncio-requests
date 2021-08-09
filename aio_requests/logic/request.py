@@ -9,7 +9,6 @@ import ssl
 async def request(
         request_type,
         url,
-        fl_obj=None,
         data=None,
         headers=None,
         auth=None,

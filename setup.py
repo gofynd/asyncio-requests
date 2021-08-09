@@ -22,7 +22,7 @@ setup(
         exclude=('local_development', 'tests*', 'docs')),
     license='',
     install_requires=[
-        'aiohttp==3.7.4.post0',
+        'aiohttp==3.7.3',
         'ujson==4.0.2',
         'requests==2.26.0',
         'zeep[async]==4.0.0',
