@@ -3,15 +3,15 @@
 from setuptools import find_packages
 from setuptools import setup
 
-description = ('Any microservice will be able to use the “aio-requests” '
+description = ('Any microservice will be able to use the “aio_requests” '
                'can make an async request(HTTP/SOAP/XML/FTP/redis) with the given payload to given address')
 
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setup(
-    name='aio-requests',
-    version='0.1',
+    name='aio_requests',
+    version='0.1rc1',
     author='Arjunsingh Yadav',
     author_email='arjunsinghyadav@fynd.com',
     description=description,
@@ -28,6 +28,6 @@ setup(
         'zeep[async]==4.0.0',
     ],
     classifiers=[
-        'Programming Language :: Python :: 3.6'
+        'Programming Language :: Python :: 3.8'
     ],
 )

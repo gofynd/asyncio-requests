@@ -20,12 +20,12 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'aio-requests'
+project = 'aio_requests'
 copyright = '2021, Arjunsingh Yadav'
 author = 'Arjunsingh Yadav'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1'
+release = '0.1rc1'
 
 
 # -- General configuration ---------------------------------------------------
