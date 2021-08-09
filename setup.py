@@ -23,8 +23,8 @@ setup(
     license='',
     install_requires=[
         'aiohttp==3.7.3',
-        'ujson==4.0.2',
-        'requests==2.26.0',
+        'ujson==4.0.1',
+        'requests==2.25.0',
         'zeep[async]==4.0.0',
     ],
     classifiers=[
