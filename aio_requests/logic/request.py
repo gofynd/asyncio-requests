@@ -65,11 +65,11 @@ async def request(
             response = await soap_request(url=url, data=data, auth=auth, response=response, timeout=timeout_allowed)
         else:
             raise Exception("Invalid request_type: {}".format(request_type))
-        response["latency"] = time() - start_time
 
     except Exception as request_error:
         response["status_code"] = 999
-        response["latency"] = (time() - start_time)
+
         response["text"] = request_error
 
-        return response
+    response["latency"] = (time() - start_time)
+    return response
