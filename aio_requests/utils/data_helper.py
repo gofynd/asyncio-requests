@@ -1,3 +1,6 @@
+import ujson
+
+
 def parse_data(data):
     """parse_data."""
     try:
