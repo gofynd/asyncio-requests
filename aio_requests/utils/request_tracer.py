@@ -2,11 +2,8 @@
 import aiohttp
 
 
-def request_tracer(fl_obj):
+def request_tracer():
     """Provide request tracing to aiohttp client sessions.
-
-    Args:
-        fl_obj (obj): Object of fynd_logger.
 
     Returns:
         trace_config (obj): An aiohttp.TraceConfig object.
@@ -72,26 +69,10 @@ def request_tracer(fl_obj):
         context.on_request_exception = session.loop.time() - context.on_request_start
         results_collector['on_request_exception'] = context.on_request_exception
         results_collector['on_request_exception_message'] = params.exception
-        if fl_obj:
-            fl_obj.log_action(
-                "state_manager",
-                **{
-                    "hog_sub_module": "aiohttp_request",
-                    "hog_sub_module_msg": "aiohttp_request tracing",
-                    "hog_sub_module_data": str(results_collector)
-                })
 
     async def on_request_end(session, context, params):
         context.on_request_end = session.loop.time() - context.on_request_start
         results_collector['on_request_end'] = context.on_request_end
-        if fl_obj:
-            fl_obj.log_action(
-                "state_manager",
-                **{
-                    "hog_sub_module": "aiohttp_request",
-                    "hog_sub_module_msg": "aiohttp_request tracing",
-                    "hog_sub_module_data": str(results_collector)
-                })
 
     results_collector = {}
     trace_config = aiohttp.TraceConfig()

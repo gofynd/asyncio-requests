@@ -5,7 +5,7 @@ from aio_requests.utils.data_helper import parse_data
 from aio_requests.utils.date_helper import get_ist_now
 
 
-async def http_request(cert, ssl, timeout_allowed, auth, url, request_type, data, fl_obj, cookies, headers, verify_ssl, response):
+async def http_request(cert, ssl, timeout_allowed, auth, url, request_type, data, cookies, headers, verify_ssl, response):
     timeout = aiohttp.ClientTimeout(total=timeout_allowed)
     auth = aiohttp.BasicAuth(auth["username"], auth["password"]) if auth else None
     ssl_context = None
@@ -15,7 +15,7 @@ async def http_request(cert, ssl, timeout_allowed, auth, url, request_type, data
         ssl_context.load_cert_chain(cert[0], cert[1])
 
     async with aiohttp.ClientSession(
-            trace_configs=[request_tracer(fl_obj)], cookies=cookies, headers=headers,
+            trace_configs=[request_tracer()], cookies=cookies, headers=headers,
             timeout=timeout, auth=auth, json_serialize=ujson.dumps
     ) as session:
 

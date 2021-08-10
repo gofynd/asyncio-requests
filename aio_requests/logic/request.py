@@ -60,7 +60,7 @@ async def request(
     }
     try:
         if protocol == "HTTP":
-            response = await http_request(cert, ssl, timeout_allowed, auth, url, request_type, data, fl_obj, cookies, headers, verify_ssl, response)
+            response = await http_request(cert, ssl, timeout_allowed, auth, url, request_type, data, cookies, headers, verify_ssl, response)
         elif protocol == "SOAP":
             response = await soap_request(url=url, data=data, auth=auth, response=response, timeout=timeout_allowed)
         else:
