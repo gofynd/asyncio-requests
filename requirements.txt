@@ -1,4 +1,5 @@
-aiohttp==3.7.3
-ujson==4.0.2
+aiohttp==3.7.4.post0
+ujson==4.2.0
 requests==2.26.0
-zeep[async]==4.0.0
+aioboto3==9.2.2
+aiofiles==0.7.0
