@@ -27,7 +27,7 @@ async def form_x_www_form_urlencoded_filters(data, **kwargs):
     return filters
 
 
-async def form_application_json_filters(data, **kwargs):
+async def application_json_filters(data, **kwargs):
     filters = {}
     request_type = kwargs["request_type"]
     http_file_config = kwargs.get("http_file_config")

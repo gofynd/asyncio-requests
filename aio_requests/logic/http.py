@@ -7,9 +7,11 @@ import ujson
 from aio_requests.utils.request_tracer import request_tracer
 from aio_requests.utils.constants import HTTP_TIMEOUT
 
-from aio_requests.helpers.internal import header_mapping
+from aio_requests.helpers.internal import header_filter_mapping
+from aio_requests.helpers.internal import header_response_mapping
 
 from aio_requests.helpers.internal.request_helper import make_http_request, fetch_file
+from aio_requests.helpers.internal.circuit_breaker_helper import CircuitBreakerHelper
 
 
 async def http_request(url, auth, response, data, info=None):
@@ -24,8 +26,10 @@ async def http_request(url, auth, response, data, info=None):
     headers = info.get("headers", {})
     http_file_config = info.get("http_file_config", {})
     serialization = info.get("serialization", ujson.dumps)
+    circuit_breaker_config = info.get("circuit_breaker_config", {})
 
     timeout = aiohttp.ClientTimeout(total=timeout)
+    circuit_breaker = CircuitBreakerHelper(**circuit_breaker_config)
 
     async with aiohttp.ClientSession(
             trace_configs=[request_tracer()], cookies=cookies, headers=headers,
@@ -38,20 +42,27 @@ async def http_request(url, auth, response, data, info=None):
                     with open(http_file_config["local_filepath"], "rb") as read_file:  # aiohttp doesnt support
                         # AioBufferedReader from aiofiles
                         filters = {"data": {http_file_config["file_key"]: read_file}}
-                        response = await make_http_request(session, url, filters, request_type, response=response,
-                                                           certificate=certificate,
-                                                           verify_ssl=verify_ssl)
+                        response = await circuit_breaker.failsafe.run(
+                            make_http_request, session, url, filters, request_type, response, certificate, verify_ssl
+                        )
+                        # response = await make_http_request(session, url, filters, request_type, response=response,
+                        #                                    certificate=certificate,
+                        #                                    verify_ssl=verify_ssl)
                     if http_file_config.get("delete_local_file"):
                         aiofiles.os.remove(http_file_config["local_filepath"])
                 except FileNotFoundError:
                     raise Exception("File Not Found in local_filepath")
             else:
-                filters = await header_mapping.get(
-                    headers.get("Content-Type", '').lower(),
-                    "default")(data, session, request_type)
-                response = await make_http_request(session, url, filters, request_type, response=response,
-                                                   certificate=certificate,
-                                                   verify_ssl=verify_ssl)
+                filters = await header_filter_mapping.get(headers.get("Content-Type", '').lower(),
+                                                          "default")(data, session, request_type)
+                response = await circuit_breaker.failsafe.run(
+                    make_http_request, session, url, filters, request_type, response, certificate, verify_ssl
+                )
+                # response = await make_http_request(session, url, filters, request_type, response=response,
+                #                                    certificate=certificate,
+                #                                    verify_ssl=verify_ssl)
+            response["json"] = await header_response_mapping.get(
+                response["headers"].get("Content-Type", '').lower(), "default")(response)
         except Exception as request_error:
             response["status_code"] = 999
             response["latency"] = (time.time() - start_time)

@@ -4,10 +4,9 @@ from typing import BinaryIO, Dict, Optional
 
 from aio_requests.helpers.common.file_helper import download_file_from_s3
 from aio_requests.helpers.internal.filters_helper import get_ssl_config
-from aio_requests.helpers.common.data_helper import parse_data
 
 
-async def fetch_file(file_config: Dict) -> Optional[BinaryIO]:
+async def fetch_file(file_config: Dict):
     """Download file from s3 or from given link or just read from the local pod file path.
 
     :param action: Fetch a file or delete it
@@ -21,7 +20,7 @@ async def fetch_file(file_config: Dict) -> Optional[BinaryIO]:
         await download_file_from_s3(
             file_config["local_filepath"],
             **file_config["s3_config"],
-            )
+        )
     elif file_config.get("file_download_path"):
         # Add separate aio params when required
         request_type = file_config.get("request_type", "get")
@@ -32,16 +31,17 @@ async def fetch_file(file_config: Dict) -> Optional[BinaryIO]:
                 contents = await response.content.read()
                 async with aiofiles.open(file_config["local_filepath"], "wb") as file_obj:
                     await file_obj.write(contents)
-    else:
-        return None
 
 
 async def make_http_request(session, url, filters, request_type, **kwargs):
     response = kwargs.get("response", {})
+
     ssl_filters = await get_ssl_config(certificate=kwargs.get("certificate"), verify_ssl=kwargs.get("verify_ssl"))
     filters.update(ssl_filters)
+
     request_obj = getattr(session, request_type.lower())
     session_obj = request_obj(url, **filters)
+
     async with session_obj as resp:
         response["status_code"] = resp.status
         response["headers"] = dict(resp.headers)
@@ -53,5 +53,4 @@ async def make_http_request(session, url, filters, request_type, **kwargs):
         except UnicodeDecodeError as err:
             response["error_message"] = f"Error occurred while converting bytes to string - {err}"
 
-    response["json"] = parse_data(response["text"])
     return response
