@@ -11,8 +11,6 @@ class CircuitBreakerHelper(object):
     def __init__(self, *args, **kwargs):
         """Initializer for CircuitBreakerHelper."""
 
-        retry_policy = None
-
         retries = kwargs.get("maximum_failures", None) or CIRCUIT_BREAKER_RETRY
         timeout = kwargs.get("timeout") or CIRCUIT_BREAKER_TIMEOUT
 
@@ -20,13 +18,12 @@ class CircuitBreakerHelper(object):
         self.circuit_breaker = CircuitBreaker(maximum_failures=retries, reset_timeout_seconds=timeout)
 
         # retry policy
-        retry_policy_dict = kwargs.get("retry_config")
-        if retry_policy_dict:
-            retry_policy = await self.__get_retry_policy(retry_policy_dict["name"], **retry_policy_dict)
+        retry_policy = kwargs.get("retry_policy")
 
         self.failsafe = Failsafe(circuit_breaker=self.circuit_breaker, retry_policy=retry_policy)
 
-    async def __get_retry_policy(self, name: Optional[str], **kwargs: Any) -> Optional[RetryPolicy]:
+    @staticmethod
+    async def get_retry_policy(name: Optional[str], **kwargs: Any) -> Optional[RetryPolicy]:
 
         allowed_retries = kwargs["allowed_retries"]
         retriable_exceptions = kwargs.get("retriable_exceptions", None)

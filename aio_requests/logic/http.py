@@ -29,6 +29,10 @@ async def http_request(url, auth, response, data, info=None):
     circuit_breaker_config = info.get("circuit_breaker_config", {})
 
     timeout = aiohttp.ClientTimeout(total=timeout)
+    if circuit_breaker_config.get("retry_config"):
+        retry_policy_dict = circuit_breaker_config["retry_config"]
+        retry_policy = await CircuitBreakerHelper.get_retry_policy(**retry_policy_dict)
+        circuit_breaker_config["retry_policy"] = retry_policy
     circuit_breaker = CircuitBreakerHelper(**circuit_breaker_config)
 
     async with aiohttp.ClientSession(
@@ -42,9 +46,9 @@ async def http_request(url, auth, response, data, info=None):
                     with open(http_file_config["local_filepath"], "rb") as read_file:  # aiohttp doesnt support
                         # AioBufferedReader from aiofiles
                         filters = {"data": {http_file_config["file_key"]: read_file}}
-                        response = await circuit_breaker.failsafe.run(
-                            make_http_request, session, url, filters, request_type, response, certificate, verify_ssl
-                        )
+                        response = await circuit_breaker.failsafe.run(make_http_request, session, url, filters,
+                                                                      request_type, certificate=certificate,
+                                                                      verify_ssl=verify_ssl)
                         # response = await make_http_request(session, url, filters, request_type, response=response,
                         #                                    certificate=certificate,
                         #                                    verify_ssl=verify_ssl)
@@ -53,17 +57,18 @@ async def http_request(url, auth, response, data, info=None):
                 except FileNotFoundError:
                     raise Exception("File Not Found in local_filepath")
             else:
-                filters = await header_filter_mapping.get(headers.get("Content-Type", '').lower(),
-                                                          "default")(data, session, request_type)
-                response = await circuit_breaker.failsafe.run(
-                    make_http_request, session, url, filters, request_type, response, certificate, verify_ssl
-                )
+                content_type = headers.get("Content-Type", "default").lower()
+                filters = await header_filter_mapping.get(content_type)(data, request_type=request_type)
+                response = await circuit_breaker.failsafe.run(make_http_request, session, url, filters, request_type,
+                                                              certificate=certificate, verify_ssl=verify_ssl)
                 # response = await make_http_request(session, url, filters, request_type, response=response,
                 #                                    certificate=certificate,
                 #                                    verify_ssl=verify_ssl)
-            response["json"] = await header_response_mapping.get(
-                response["headers"].get("Content-Type", '').lower(), "default")(response)
+            res_content_type = response["headers"].get("Content-Type", "default").lower()
+            response["json"] = await header_response_mapping.get(res_content_type)(response["text"])
         except Exception as request_error:
             response["status_code"] = 999
             response["latency"] = (time.time() - start_time)
             response["text"] = request_error
+
+        return response
