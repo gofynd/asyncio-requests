@@ -73,8 +73,7 @@ async def request(
                                                                                     **pre_processor_config.get("params",
                                                                                                                {}))
 
-    processor_response = await protocol_mapping[protocol](url, auth, response, data, info=protocol_info)
-    response["api_response"] = processor_response
+    response["api_response"] = await protocol_mapping[protocol](url, auth, response, data, info=protocol_info)
 
     if post_processor_config:
         response["post_processor_response"] = await post_processor_config["function"](url, data, auth,
