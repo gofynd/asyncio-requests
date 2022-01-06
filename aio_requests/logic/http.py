@@ -14,7 +14,7 @@ from aio_requests.helpers.internal.request_helper import make_http_request, fetc
 from aio_requests.helpers.internal.circuit_breaker_helper import CircuitBreakerHelper
 
 
-async def http_request(url, auth, response, data, info=None):
+async def http_request(url, auth, response, info=None):
     if info is None:
         info = {}
     start_time = time.time()
@@ -49,23 +49,21 @@ async def http_request(url, auth, response, data, info=None):
                         response = await circuit_breaker.failsafe.run(make_http_request, session, url, filters,
                                                                       request_type, certificate=certificate,
                                                                       verify_ssl=verify_ssl)
-                        # response = await make_http_request(session, url, filters, request_type, response=response,
-                        #                                    certificate=certificate,
-                        #                                    verify_ssl=verify_ssl)
                     if http_file_config.get("delete_local_file"):
                         aiofiles.os.remove(http_file_config["local_filepath"])
                 except FileNotFoundError:
                     raise Exception("File Not Found in local_filepath")
             else:
                 content_type = headers.get("Content-Type", "default").lower()
-                filters = await header_filter_mapping.get(content_type)(data, request_type=request_type)
+                filters = await header_filter_mapping.get(content_type)(response["payload"], request_type=request_type)
                 response = await circuit_breaker.failsafe.run(make_http_request, session, url, filters, request_type,
                                                               certificate=certificate, verify_ssl=verify_ssl)
                 # response = await make_http_request(session, url, filters, request_type, response=response,
                 #                                    certificate=certificate,
                 #                                    verify_ssl=verify_ssl)
             res_content_type = response["headers"].get("Content-Type", "default").lower()
-            response["json"] = await header_response_mapping.get(res_content_type)(response["text"])
+            response["json"] = await header_response_mapping.get(res_content_type)(response["text"]) if \
+                header_response_mapping.get(res_content_type) else ""
         except Exception as request_error:
             response["status_code"] = 999
             response["latency"] = (time.time() - start_time)

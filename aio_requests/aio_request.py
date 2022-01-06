@@ -9,7 +9,8 @@ async def request(
         protocol="",
         protocol_info=None,
         pre_processor_config=None,
-        post_processor_config=None
+        post_processor_config=None,
+        **kwargs
 ):
     """Multiple protocols calls with pre processor, post processor and retry support.
 
@@ -68,16 +69,14 @@ async def request(
         return response
 
     if pre_processor_config:
-        response["pre_processor_response"] = await pre_processor_config["function"](url, data, auth, protocol,
-                                                                                    response, info=protocol_info,
+        response["pre_processor_response"] = await pre_processor_config["function"](response=response,
                                                                                     **pre_processor_config.get("params",
                                                                                                                {}))
 
-    response["api_response"] = await protocol_mapping[protocol](url, auth, response, data, info=protocol_info)
+    response["api_response"] = await protocol_mapping[protocol](url, auth, response, info=protocol_info)
 
     if post_processor_config:
-        response["post_processor_response"] = await post_processor_config["function"](url, data, auth,
-                                                                                      response, info=protocol_info,
+        response["post_processor_response"] = await post_processor_config["function"](response=response,
                                                                                       **post_processor_config.get(
                                                                                           "params", {}))
     return response
