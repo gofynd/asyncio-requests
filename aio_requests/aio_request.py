@@ -41,8 +41,8 @@ async def request(
                 "on_retries_exhausted": Optional callable that will be invoked on a retries exhausted event,
                 "on_failed_attempt": Optional callable that will be invoked on a failed attempt event,
                 "on_abort": Optional callable that will be invoked on an abort event,
-                "delay": int seconds of delay between retries Optinal default 0,
-                "max_delay": int seconds of max delay between retries Optinal default 0,
+                "delay": int seconds of delay between retries Optional default 0,
+                "max_delay": int seconds of max delay between retries Optional default 0,
                 "jitter": Boolean Optional,
             } #Optional Include this if you want retry
         } #Optional
