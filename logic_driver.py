@@ -11,11 +11,12 @@ async def test(*args, **kwargs):
 # https://api.fyndx1.de/masquerader/v1/aio-request-test/post
 # https://api.fyndx1.de/masquerader/v1/aio-request-test/put
 # https://api.fyndx1.de/masquerader/v1/aio-request-test/delete
+# http://116.50.64.106:8080/fynd/orders/S127163135/invoice/b2b/file
 
 
 res = asyncio.run(
     request(
-        url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
+        url="http://116.50.64.106:8080/fynd/orders/S127163135/invoice/b2b/file",
         data={
             "key0": "val0"
         },
@@ -23,13 +24,14 @@ res = asyncio.run(
         protocol_info={
             "request_type": "POST",
             "circuit_breaker_config": {
+                "timeout": 150,
                 "retry_config": {
                     "name": "asdf",
-                    "allowed_retries": 5
+                    "allowed_retries": 1
                 }
             },
             "http_file_config": {
-                "local_filepath": "/home/manish/Downloads/4Dec2021Ahm-Surat.pdf",
+                "local_filepath": "/tmp/temp.pdf",
                 "file_key": "file"
             }
         },
