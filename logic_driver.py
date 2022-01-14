@@ -1,4 +1,3 @@
-from logic_test import logic_test
 from aio_requests.aio_request import request
 import asyncio
 
