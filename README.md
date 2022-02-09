@@ -1,11 +1,49 @@
 # Fynd Async HTTP Request Library
-Used to make async http calls with inbuilt circuit breaker feature, uses aiohttp internally. If any operation is needed
-before or after API call then here you can just pass the function address and params of that function. If an API call
-needed to call another API then you can also pass the library function itself to do the task. This supports async 
-functions.
+
+This library provides the functionality to make async API calls via HTTP / SOAP / FTP protocols via a config.
+
+**Open Source contribution -** 
+
+You can add utilities that can be used by others. 
+
+Eg - Contributing a function that accepts certain params and downloads a file via AWS S3.
+This function can be used by other developers in the pre/post processor to download the file before or after making the API call.
+
+**Make sure to add the utility in the utilities section in the readme wrt protocol.**
+
+### HTTP
+
+* Uses aiohttp internally
+* Has an inbuilt circuit breaker
+* Currently supports infinite nested depth of pre and post processors
+* Retry Functionality
+* Exceptions can be contributed in the utilities and you can use your own exceptions in the circuit breaker config as well.
+
+Params understanding - 
+* Auth param is expected to be an auth object of your choice which is accepted by aiohttp. TODO modify sentence
+* Default HTTP timeout is 15 seconds
+* By default circuit breaker is not enabled and is activated only if provided with its config.
+* By default retry is not enabled and is activated only if provided with its config.
+* Default Request tracer is enabled which provides the traces of the whole request wrt data chunks, dns cache hit etc.
+* In case of user specific request tracer, a list of request tracer objects is expected which will override the default tracer.
+* Default serialization is via ujson and can be overwritten by specifying one
+* SSL is enabled by default
+* Certificate is expected in the format ('certificate path', 'certificate key path')
+
+Config understanding - 
 
 
-### Work FLow
+
+
+**Utilities Included**
+* Download a file from AWS S3
+
+Used to make async http calls with inbuilt circuit breaker feature, uses aiohttp internally. 
+If any operation is needed before or after making the API call then you can just pass the function address of the pre processor or post processor along with the params.
+It also supports nested pre and post processor currently without any limit to the depth.
+
+
+### HTTP Work FLow
 * Request are send to library, builds & performs checks on auth and headers and payloads provided.
 * Since aiohttp is used to make http calls, event loop is used to make calls
 * Circuit breaker checks are made before final request hit is done.
