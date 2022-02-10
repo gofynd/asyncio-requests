@@ -17,7 +17,7 @@ async def request(
     :param url: URL to call
     :param data: Data to be sent in calls
     :param protocol: values HTTP/HTTPS
-    :param auth: Tuple (username, password) Optional field
+    :param auth: aiohttp.BasicAuth(username, password) Optional field any auth abject is accepted supported by aiohttp
     :param protocol_info: {
         "request_type": "GET", #required
         "timeout": int, #Optional
@@ -25,6 +25,7 @@ async def request(
         "verify_ssl": Boolean, #Optional,
         "cookies": "", #Optional,
         "headers": {}, #Optional,
+        "trace_config": request tracer object list,  #Optional default is [aiohttp.TraceConfig()]
         "http_file_config" {
             "local_filepath": "required",
             "file_key": "required",

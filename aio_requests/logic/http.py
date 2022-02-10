@@ -24,6 +24,7 @@ async def http_request(url, auth, response, info=None):
     verify_ssl = info.get("verify_ssl", True)
     cookies = info.get("cookies")
     headers = info.get("headers", {})
+    trace_config = info.get("trace_config", [request_tracer()])
     http_file_config = info.get("http_file_config", {})
     serialization = info.get("serialization", ujson.dumps)
     circuit_breaker_config = info.get("circuit_breaker_config", {})
@@ -36,31 +37,22 @@ async def http_request(url, auth, response, info=None):
     circuit_breaker = CircuitBreakerHelper(**circuit_breaker_config)
 
     async with aiohttp.ClientSession(
-            trace_configs=[request_tracer()], cookies=cookies, headers=headers,
+            trace_configs=trace_config, cookies=cookies, headers=headers,
             timeout=timeout, auth=auth, json_serialize=serialization
     ) as session:
         try:
             if http_file_config:
                 await fetch_file(http_file_config)
-                try:
-                    with open(http_file_config["local_filepath"], "rb") as read_file:  # aiohttp doesnt support
-                        # AioBufferedReader from aiofiles
-                        filters = {"data": {http_file_config["file_key"]: read_file}}
-                        response = await circuit_breaker.failsafe.run(make_http_request, session, url, filters,
-                                                                      request_type, certificate=certificate,
-                                                                      verify_ssl=verify_ssl)
-                    if http_file_config.get("delete_local_file"):
-                        aiofiles.os.remove(http_file_config["local_filepath"])
-                except FileNotFoundError:
-                    raise Exception("File Not Found in local_filepath")
+                with open(http_file_config["local_filepath"], "rb") as read_file:  # aiohttp doesnt support
+                    filters = {"data": {http_file_config["file_key"]: read_file}}
+                    response = await circuit_breaker.failsafe.run(make_http_request, session, url, filters,
+                                                                  request_type, certificate=certificate,
+                                                                  verify_ssl=verify_ssl)
             else:
                 content_type = headers.get("Content-Type", "default").lower()
                 filters = await header_filter_mapping.get(content_type)(response["payload"], request_type=request_type)
                 response = await circuit_breaker.failsafe.run(make_http_request, session, url, filters, request_type,
                                                               certificate=certificate, verify_ssl=verify_ssl)
-                # response = await make_http_request(session, url, filters, request_type, response=response,
-                #                                    certificate=certificate,
-                #                                    verify_ssl=verify_ssl)
             res_content_type = response["headers"].get("Content-Type", "default").lower()
             response["json"] = await header_response_mapping.get(res_content_type)(response["text"]) if \
                 header_response_mapping.get(res_content_type) else ""

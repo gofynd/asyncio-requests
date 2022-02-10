@@ -1,5 +1,6 @@
 from aio_requests.aio_request import request
 import asyncio
+from aio_requests.utils.http_file_config import download_file_from_url, delete_local_file_path
 
 
 async def test(*args, **kwargs):
@@ -11,11 +12,12 @@ async def test(*args, **kwargs):
 # https://api.fyndx1.de/masquerader/v1/aio-request-test/put
 # https://api.fyndx1.de/masquerader/v1/aio-request-test/delete
 # http://116.50.64.106:8080/fynd/orders/S127163135/invoice/b2b/file
+local_file_path = "/tmp/test.pdf"
 
 
 res = asyncio.run(
     request(
-        url="http://116.50.64.106:8080/fynd/orders/S127163135/invoice/b2b/file",
+        url="http://localhost:5000/api/v1/test/aio-request-files",
         data={
             "key0": "val0"
         },
@@ -30,10 +32,23 @@ res = asyncio.run(
                 }
             },
             "http_file_config": {
-                "local_filepath": "/tmp/temp.pdf",
+                "local_filepath": local_file_path,
                 "file_key": "file"
             }
         },
+        pre_processor_config={
+            "function": download_file_from_url,
+            "params": {
+                "file_download_path": "https://s3.ap-south-1.amazonaws.com/fynd-platform-test-mumbai/trell-3000008556-label-1643895203.pdf",
+                "local_filepath": local_file_path
+            }
+        },
+        post_processor_config={
+            "function": delete_local_file_path,
+            "params": {
+                "local_filepath": local_file_path
+            }
+        }
         # pre_processor_config={
         #     "function": request,
         #     "async_enabled": True,
