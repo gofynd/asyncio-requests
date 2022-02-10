@@ -1,13 +1,126 @@
 # Fynd Async HTTP Request Library
+
+This library provides the functionality to make async API calls via HTTP / SOAP / FTP protocols via a config.
+
+**Open Source contribution -** 
+
+You can add utilities that can be used by others. 
+
+Eg - Contributing a function that accepts certain params and downloads a file via AWS S3.
+This function can be used by other developers in the pre/post processor to download the file before or after making the API call.
+
+**Make sure to add the utility in the utilities section in the readme wrt protocol.**
+
+### HTTP
+
+* Uses aiohttp internally
+* Has an inbuilt circuit breaker
+* Currently supports infinite nested depth of pre and post processors
+* Retry Functionality
+* Exceptions can be contributed in the utilities and you can use your own exceptions in the circuit breaker config as well.
+
+Params understanding - 
+* Auth param is expected to be an auth object of your choice which is accepted by aiohttp. TODO modify sentence
+* Default HTTP timeout is 15 seconds
+* By default circuit breaker is not enabled and is activated only if provided with its config.
+* By default retry is not enabled and is activated only if provided with its config.
+* Default Request tracer is enabled which provides the traces of the whole request wrt data chunks, dns cache hit etc.
+* In case of user specific request tracer, a list of request tracer objects is expected which will override the default tracer.
+* Default serialization is via ujson and can be overwritten by specifying one
+* SSL is enabled by default
+* Certificate is expected in the format ('certificate path', 'certificate key path')
+
+Config understanding - 
+
+
+
+
+**Utilities Included**
+* Download a file from AWS S3
+
 Used to make async http calls with inbuilt circuit breaker feature, uses aiohttp internally. 
+If any operation is needed before or after making the API call then you can just pass the function address of the pre processor or post processor along with the params.
+It also supports nested pre and post processor currently without any limit to the depth.
 
 
-### Work FLow
+### HTTP Work FLow
 * Request are send to library, builds & performs checks on auth and headers and payloads provided.
 * Since aiohttp is used to make http calls, event loop is used to make calls
 * Circuit breaker checks are made before final request hit is done.
 * Auto retry attempts are done by library if any network/OS exceptions or request time occurs
 * Success/Fail/Exception Response will be provided to the client along with approprirate status code, message & response payload.
+* You will see also the pre-processor and post-processor function out too in output.
+
+
+### How To Use
+```python
+from aio_request import request
+
+
+await request(
+    url="URL FOR REQUEST",
+    data={
+        "key": "val"
+        # Data to be sent in body
+    },
+    auth=("Username", "password").  # Tuple (username, password) for basic auth - Optional field
+    protocol="REQUEST PROTOCOL", # HTTP/HTTPS
+    protocol_info={
+        "request_type": "GET", #required
+        "timeout": int,  #Optional
+        "certificate: "",  #Optional,
+        "verify_ssl": Boolean,  #Optional,
+        "cookies": "",  #Optional,
+        "headers": {},  #Optional,
+        "http_file_config": {  #optional Include only if you want call api with file. If this is included api body will have only file
+            "local_filepath": "required",  # File path to be sent
+            "file_key": "required",  # File to be sent on which key in request body
+            "delete_local_file": "boolean Optional"  # After making API if you want to delete file then add value as True default is false.
+        },
+        "circuit_breaker_config": {  # Optional
+            "maximum_failures": int,  # Optional Failures allowed
+            "timeout": int,  # Optional time in seconds
+            "retry_config": {  # Optional Include this if you want retry API calls if failed on first time
+                "name": str,  # Required Any name
+                "allowed_retries": int,  # Required number of retries you want to make 
+                "retriable_exceptions": [Optional list of Exceptions],
+                "abortable_exceptions": [Optional list of Exceptions],
+                "on_retries_exhausted": Optional callable that will be invoked on a retries exhausted event,
+                "on_failed_attempt": Optional callable that will be invoked on a failed attempt event,
+                "on_abort": Optional callable that will be invoked on an abort event,
+                "delay": int seconds of delay between retries Optional default 0,
+                "max_delay": int seconds of max delay between retries Optional default 0,
+                "jitter": Boolean Optional,
+            } 
+        }
+    },
+    pre_processor_config={  # Optional
+        "function": function_address, # Required function that you want to call before http call
+        "params": {  # Optional
+            "param1": "value1"
+            # Params you want to pass in function
+        } 
+    },
+    post_processor_config={  # Optional
+       "function": function_address,  # Required function that you want to call after http call 
+       "params": {
+          "param1": "value1"
+          # Params you want to pass in function
+       }
+    }
+)
+```
+
+
+### Some use cases where this library can be used
+* HTTP Call
+* Some logic to be performed for sending payload to api call then use pre_processor_config
+* In pre_processor_config you can also pass the address of request function from library if an API call is needed to make other API call. So from response of pre_processor_config you can add payload to actual API call payload
+* Some logic to be performed on the response of API call then use post_processor_config
+* Some file to be sent in http call using form data then use http_file_config
+* If you use http_file_config then only file is included in the API call.
+* If you want to retry the API call then use retry_config
+
 
 ### How To Use
 * Create instance of request builder library     
