@@ -31,7 +31,38 @@ Params understanding -
 * Certificate is expected in the format ('certificate path', 'certificate key path')
 
 Config understanding - 
-
+* pre_processor_config - Optional:
+  * Takes async function address which is executed before making request - Required
+  * Params dictionary where key is parameter to the function passed in pre processor and values is parameter value
+* post_processor_config - Optional:
+  * function: Takes async function address which is executed after making request - Required
+  * Params: Takes dictionary where key is parameter to the function passed in pre processor and values is parameter value
+* protocol_info - Required:
+  * request_type: string HTTP Method - Required
+  * timeout: int seconds which what timeout you want to keep for request - Optional
+  * certificate: If any certificate you want to pass in aiohttp circuit breaker - Optional
+  * verify_ssl: Boolean if you want to verify ssl pass True else False - Optional
+  * cookies: Dict Any cookies need to be passed - Optional
+  * headers: Dict Any header to be passed in request- Optional
+  * trace_config: request tracer object if want use request tracer default tracer is aiohttp.TraceConfig() - Optional
+  * http_file_config: Dict use this only if you want to send file in request. If you use this config then only file will be sent in request - Optional
+    * local_filepath: machine file path for file to be sent in request
+    * file_key: In which key the file to be sent
+  * serialization: If you want to use any json serializer then you can pass here default is ujson.dumps - Optional
+  * circuit_breaker_config: Dict - Optional
+    * maximum_failures: int maximum failures you want to allow for request default is 5 - Optional
+    * timeout: int seconds timeout you want to keep for request default is 60 seconds - Default
+    * retry_config: Dict invlude this config only if you want to perform retries - Optional
+      * name: str required
+      * allowed_retries: int this is for how many retries you want to perform - Required
+      * retriable_exceptions: list of Exceptions on which you want to retry - Optional
+      * abortable_exceptions: list of Exceptions on which exception the request to be aborted
+      * on_retries_exhausted: callable/function_address which will be invoked on retry exhausted event - Optional
+      * on_failed_attempt: callable/function_address that will be invoked on a failed attempt event - Optioanl
+      * on_abort: callable that will be invoked on an abort event - Optionanl
+      * delay: int seconds of delay between retries default 0 - Optional
+      * max_delay: int seconds of max delay between retries default 0 - Optional
+      * jitter: Boolean Optional
 
 
 
