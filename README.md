@@ -63,7 +63,7 @@ This function can be used by other developers in the pre/post processor to downl
           <li>The function address can be used from the utilities folder which is contributed by all or your own function address.</li>
           <li>You can nest the whole API. Eg - you can pass the address of aio_requests.request function too. The response will be a nested one. (Explained via example down)</li>
         </ul>
-      </td>>
+      </td>
     </tr>
     <tr>
       <td align="center">post_processor_config</td>
@@ -194,17 +194,6 @@ await request(
     }
 )
 ```
-
-
-* Make a call to `make_client_request`  with payload as argument    
-`response = request_builder.make_client_request(http_get_request_payload)`
-
-* Request are send to library, builds & performs checks on auth and headers and payloads provided.
-* Since aiohttp is used to make http calls, event loop is used to make calls
-* Circuit breaker checks are made before final request hit is done.
-* Auto retry attempts are done by library if any network/OS exceptions or request time occurs
-* Success/Fail/Exception Response will be provided to the client along with approprirate status code, message & response payload.
-* You will see also the pre-processor and post-processor function out too in output.
 
 
 **Utilities Included**
