@@ -77,7 +77,7 @@ This function can be used by other developers in the pre/post processor to downl
           <li>similar to pre processor, difference being this is executed after making an API call.</li>
           <li>Eg - if you want to send the data of a file in the API call and the file needs to be downloaded. You can have a file download pre processor functionand have a file deletion post processor function.</li>
         </ul>
-      </td>>
+      </td>
     </tr>
     <tr aria-rowspan="12">
       <td align="center">protocol_info</td>
@@ -120,7 +120,7 @@ This function can be used by other developers in the pre/post processor to downl
             </ul>
           </li>
         </ul>
-      </td>>
+      </td>
     </tr>
   </tbody>
 </table>
