@@ -196,70 +196,6 @@ await request(
 ```
 
 
-**Utilities Included**
-* Download a file from AWS S3
-
-
-
-### How To Use
-```python
-from aio_request import request
-
-await request(
-    url="URL FOR REQUEST",
-    data={
-        "key": "val"
-        # Data to be sent in body
-    },
-    auth=("Username", "password").  # Tuple (username, password) for basic auth - Optional field
-    protocol="REQUEST PROTOCOL", # HTTP/HTTPS
-    protocol_info={
-        "request_type": "GET", #required
-        "timeout": int,  #Optional
-        "certificate: "",  #Optional,
-        "verify_ssl": Boolean,  #Optional,
-        "cookies": "",  #Optional,
-        "headers": {},  #Optional,
-        "http_file_config": {  #optional Include only if you want call api with file. If this is included api body will have only file
-            "local_filepath": "required",  # File path to be sent
-            "file_key": "required",  # File to be sent on which key in request body
-            "delete_local_file": "boolean Optional"  # After making API if you want to delete file then add value as True default is false.
-        },
-        "circuit_breaker_config": {  # Optional
-            "maximum_failures": int,  # Optional Failures allowed
-            "timeout": int,  # Optional time in seconds
-            "retry_config": {  # Optional Include this if you want retry API calls if failed on first time
-                "name": str,  # Required Any name
-                "allowed_retries": int,  # Required number of retries you want to make 
-                "retriable_exceptions": [Optional list of Exceptions],
-                "abortable_exceptions": [Optional list of Exceptions],
-                "on_retries_exhausted": Optional callable that will be invoked on a retries exhausted event,
-                "on_failed_attempt": Optional callable that will be invoked on a failed attempt event,
-                "on_abort": Optional callable that will be invoked on an abort event,
-                "delay": int seconds of delay between retries Optional default 0,
-                "max_delay": int seconds of max delay between retries Optional default 0,
-                "jitter": Boolean Optional,
-            } 
-        }
-    },
-    pre_processor_config={  # Optional
-        "function": function_address, # Required function that you want to call before http call
-        "params": {  # Optional
-            "param1": "value1"
-            # Params you want to pass in function
-        } 
-    },
-    post_processor_config={  # Optional
-       "function": function_address,  # Required function that you want to call after http call 
-       "params": {
-          "param1": "value1"
-          # Params you want to pass in function
-       }
-    }
-)
-```
-
-
 ### Log Request Metric
 If `log_request_metric` key is set and send along with request gives trace as below for the request     
 
@@ -282,3 +218,8 @@ If `log_request_metric` key is set and send along with request gives trace as be
 			}
  }
  ```  
+
+
+**Utilities Included**
+* Download a file from AWS S3
+
