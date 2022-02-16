@@ -195,31 +195,6 @@ await request(
 )
 ```
 
-
-### Log Request Metric
-If `log_request_metric` key is set and send along with request gives trace as below for the request     
-
-```
-  2019-08-05 22:12:07,975-fynd_logger.py-INFO-{
- "app_ist_log_datetime": "2019-08-05 22:12:07.974752",           
- "app_ist_log_timestamp": 1565023327.974799,           
- "file_name": "/var/projects/fynd/fynd-request-builder/src/fynd_request_builder/request.py",           
- "line_no": 217,           
- "function_name": "add_requests_logs",           
- "search_id": "f6699432-b79f-11e9-a13c-34415dc88eee",           
- "search_term": "aiohttp_request_trace_metric",           
- "action": "aiohttp_request_trace_metric",           
- "status": "success",           
- "payload": {"request_header": "[[\"X-Fynd-Trace-Id\",\"f6699432-b79f-11e9-a13c-34415dc88eee\"]]",       
-			 "connect": 427.02,         
-			 "transfer": 209.87,      
-			 "total": 637.59,      
-			 "is_redirect": false
-			}
- }
- ```  
-
-
 **Utilities Included**
 * Download a file from AWS S3
 
