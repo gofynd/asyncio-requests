@@ -12,6 +12,9 @@ async def test(*args, **kwargs):
 # https://api.fyndx1.de/masquerader/v1/aio-request-test/put
 # https://api.fyndx1.de/masquerader/v1/aio-request-test/delete
 # http://localhost:5000/api/v1/test/aio-request-files
+# class HttpFileConfigTest(BaseHandler):
+#     async def post(self, request, **kwargs):
+#         return json({"success": True, "message": ""})
 local_file_path = "/tmp/test.pdf"
 
 

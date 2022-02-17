@@ -138,7 +138,7 @@ Defaults -
 ### How to Use
 * Design the http request payload as per below format     
 ```python
-from aio_request import request
+from aio_requests.aio_request import request
 
 
 await request(
@@ -197,10 +197,10 @@ await request(
 
 * Basic HTTP POST call
 ```python
-from aio_request import request
+from aio_requests.aio_request import request
 
 
-await request(
+result = await request(
     url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
     data={
         "first_name": "Joy",
@@ -212,11 +212,59 @@ await request(
         "request_type": "POST"
     }
 )
+
+### Value of result
+"""
+{
+  'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
+  'payload': {
+    'first_name': 'Joy',
+    'last_name': 'Pandey',
+    'gender': 'M'
+  },
+  'external_call_request_time': '2022-02-17 17:25:03.930531+05:30',
+  'text': '',
+  'error_message': '',
+  'api_response': {
+    'status_code': 200,
+    'headers': {
+      'Date': 'Thu, 17 Feb 2022 11:55:04 GMT',
+      'Content-Type': 'application/json',
+      'Content-Length': '57',
+      'Connection': 'keep-alive',
+      'X-Fynd-Trace-Id': '78ca02ff444ae5855e856c5f3d769364'
+    },
+    'cookies': {
+      
+    },
+    'content': b'{"method": "POST", "status": true, "error_message": null}',
+    'text': '{"method": "POST", "status": true, "error_message": null}',
+    'json': {
+      'method': 'POST',
+      'status': True,
+      'error_message': None
+    },
+    'request_tracer': [
+      {
+        'on_request_start': 287753.868594354,
+        'is_redirect': False,
+        'on_connection_create_start': 0.0002811980084516108,
+        'on_dns_cache_miss': 0.002910615992732346,
+        'on_dns_resolvehost_start': 0.0029266909696161747,
+        'on_dns_resolvehost_end': 0.04894679499557242,
+        'on_connection_create_end': 0.15098483895417303,
+        'on_request_chunk_sent': 0.15202936198329553,
+        'on_request_end': 0.2799108889885247
+      }
+    ]
+  }
+}
+"""
 ```
 
 * API with some pre and post process enabled with circuit breaker and retrieies
 ```python
-from aio_request import request
+from aio_requests.aio_request import request
 from typing import Dict, Text
 
 
@@ -226,15 +274,13 @@ async def make_request_payload(response: Dict, first_name: Text, last_name: Text
         "last_name": last_name,
         "gender": gender
     }
-    return response
 
 
 async def print_response_recieved_from_api(response: Dict, text: Text):
     print(f"{text}{response['api_response']}")
-    return response
 
 
-await request(
+result = await request(
     url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
     protocol="HTTPS",
     protocol_info={
@@ -262,16 +308,394 @@ await request(
         }
     }
 )
+
+### Value of result
+"""
+{
+  'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
+  'payload': {
+    'first_name': 'Joy',
+    'last_name': 'Pandey',
+    'gender': 'M'
+  },
+  'external_call_request_time': '2022-02-17 17:33:35.508376+05:30',
+  'text': '',
+  'error_message': '',
+  'pre_processor_response': None,
+  'api_response': {
+    'status_code': 200,
+    'headers': {
+      'Date': 'Thu, 17 Feb 2022 12:03:35 GMT',
+      'Content-Type': 'application/json',
+      'Content-Length': '57',
+      'Connection': 'keep-alive',
+      'X-Fynd-Trace-Id': '8903eeb30ed218385631d3b52d04b38e'
+    },
+    'cookies': {
+      
+    },
+    'content': b'{"method": "POST", "status": true, "error_message": null}',
+    'text': '{"method": "POST", "status": true, "error_message": null}',
+    'json': {
+      'method': 'POST',
+      'status': True,
+      'error_message': None
+    },
+    'request_tracer': [
+      {
+        'on_request_start': 288265.446420053,
+        'is_redirect': False,
+        'on_connection_create_start': 0.00028238497907295823,
+        'on_dns_cache_miss': 0.0028724189614877105,
+        'on_dns_resolvehost_start': 0.002888173970859498,
+        'on_dns_resolvehost_end': 0.09302646096330136,
+        'on_connection_create_end': 0.2075990799930878,
+        'on_request_chunk_sent': 0.20890663599129766,
+        'on_request_end': 0.319920428970363
+      }
+    ]
+  },
+  'post_processor_response': None
+}
+"""
 ```
 
 * API call with pre and post API call
 ```python
-from aio_request import request
+from aio_requests.aio_request import request
 
 
-await request(
-    
+async def test_fun(*args, **kwargs):
+    return {"text": "final res"}
+
+
+result = await request(
+    url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
+    data={
+        "first_name": "Joy",
+        "last_name": "Pandey",
+        "Gender": "M"
+    },
+    protocol="HTTP",
+    protocol_info={
+        "request_type": "POST",
+        "circuit_breaker_config": {
+            "timeout": 150,
+            "retry_config": {
+                "name": "asdf",
+                "allowed_retries": 1
+            }
+        }
+    },
+    pre_processor_config={
+        "function": request,
+        "async_enabled": True,
+        "params": {
+            "url": "https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
+            "data": {
+                "first_name": "Joy",
+                "last_name": "Pandey",
+                "Gender": "M"
+            },
+            "protocol": "HTTP",
+            "protocol_info": {
+                "request_type": "POST",
+                "circuit_breaker_config": {
+                    "retry_config": {
+                        "name": "asdf",
+                        "allowed_retries": 5
+                    }
+                },
+            },
+            "pre_processor_config": {
+                "function": test_fun,
+                "async_enabled": True,
+                "params": {
+                    "url": "https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
+                    "data": {
+                        "first_name": "Joy",
+                        "last_name": "Pandey",
+                        "Gender": "M"
+                    },
+                    "protocol": "HTTP",
+                    "protocol_info": {
+                        "request_type": "POST",
+                        "circuit_breaker_config": {
+                            "retry_config": {
+                                "name": "asdf",
+                                "allowed_retries": 5
+                            }
+                        },
+                    }
+                }
+            }
+        }
+    },
+    post_processor_config={
+        "function": request,
+        "async_enabled": True,
+        "params": {
+            "url": "https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
+            "data": {
+                "first_name": "Joy",
+                "last_name": "Pandey",
+                "Gender": "M"
+            },
+            "protocol": "HTTP",
+            "protocol_info": {
+                "request_type": "POST",
+                "circuit_breaker_config": {
+                    "retry_config": {
+                        "name": "asdf",
+                        "allowed_retries": 5
+                    }
+                },
+            },
+            "post_processor_config": {
+                "function": test_fun,
+                "async_enabled": True,
+                "params": {
+                    "url": "https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
+                    "data": {
+                        "first_name": "Joy",
+                        "last_name": "Pandey",
+                        "Gender": "M"
+                    },
+                    "protocol": "HTTP",
+                    "protocol_info": {
+                        "request_type": "POST",
+                        "circuit_breaker_config": {
+                            "retry_config": {
+                                "name": "asdf",
+                                "allowed_retries": 5
+                            }
+                        },
+                    }
+                }
+            }
+        }
+    }
 )
+
+### Value of result
+"""
+{
+  'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
+  'payload': {
+    'first_name': 'Joy',
+    'last_name': 'Pandey',
+    'Gender': 'M'
+  },
+  'external_call_request_time': '2022-02-17 17:22:01.383304+05:30',
+  'text': '',
+  'error_message': '',
+  'pre_processor_response': {
+    'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
+    'payload': {
+      'first_name': 'Joy',
+      'last_name': 'Pandey',
+      'Gender': 'M'
+    },
+    'external_call_request_time': '2022-02-17 17:22:01.383358+05:30',
+    'text': '',
+    'error_message': '',
+    'pre_processor_response': {
+      'text': 'final res'
+    },
+    'api_response': {
+      'status_code': 200,
+      'headers': {
+        'Date': 'Thu, 17 Feb 2022 11:52:01 GMT',
+        'Content-Type': 'application/json',
+        'Content-Length': '57',
+        'Connection': 'keep-alive',
+        'X-Fynd-Trace-Id': 'b1a3111270067ae160eeaf9971b04cc5'
+      },
+      'cookies': {
+        
+      },
+      'content': b'{"method": "POST", "status": true, "error_message": null}',
+      'text': '{"method": "POST", "status": true, "error_message": null}',
+      'json': {
+        'method': 'POST',
+        'status': True,
+        'error_message': None
+      },
+      'request_tracer': [
+        {
+          'on_request_start': 287571.321608293,
+          'is_redirect': False,
+          'on_connection_create_start': 0.00031328899785876274,
+          'on_dns_cache_miss': 0.0029667950002476573,
+          'on_dns_resolvehost_start': 0.0029829980339854956,
+          'on_dns_resolvehost_end': 0.0064852479845285416,
+          'on_connection_create_end': 0.08529951400123537,
+          'on_request_chunk_sent': 0.0858444279874675,
+          'on_request_end': 0.1671372150303796
+        }
+      ]
+    }
+  },
+  'api_response': {
+    'status_code': 200,
+    'headers': {
+      'Date': 'Thu, 17 Feb 2022 11:52:01 GMT',
+      'Content-Type': 'application/json',
+      'Content-Length': '57',
+      'Connection': 'keep-alive',
+      'X-Fynd-Trace-Id': '3340481533a6511b15952cabb4c144bb'
+    },
+    'cookies': {
+      
+    },
+    'content': b'{"method": "POST", "status": true, "error_message": null}',
+    'text': '{"method": "POST", "status": true, "error_message": null}',
+    'json': {
+      'method': 'POST',
+      'status': True,
+      'error_message': None
+    },
+    'request_tracer': [
+      {
+        'on_request_start': 287571.490459029,
+        'is_redirect': False,
+        'on_connection_create_start': 0.0006432340014725924,
+        'on_dns_cache_miss': 0.00104641099460423,
+        'on_dns_resolvehost_start': 0.001091104990337044,
+        'on_dns_resolvehost_end': 0.0037200640072114766,
+        'on_connection_create_end': 0.10335264401510358,
+        'on_request_chunk_sent': 0.10410607699304819,
+        'on_request_end': 0.18950222100829706
+      }
+    ]
+  },
+  'post_processor_response': {
+    'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
+    'payload': {
+      'first_name': 'Joy',
+      'last_name': 'Pandey',
+      'Gender': 'M'
+    },
+    'external_call_request_time': '2022-02-17 17:22:01.743288+05:30',
+    'text': '',
+    'error_message': '',
+    'api_response': {
+      'status_code': 200,
+      'headers': {
+        'Date': 'Thu, 17 Feb 2022 11:52:02 GMT',
+        'Content-Type': 'application/json',
+        'Content-Length': '57',
+        'Connection': 'keep-alive',
+        'X-Fynd-Trace-Id': 'a0304896aabbc394894d442fa27a5c3e'
+      },
+      'cookies': {
+        
+      },
+      'content': b'{"method": "POST", "status": true, "error_message": null}',
+      'text': '{"method": "POST", "status": true, "error_message": null}',
+      'json': {
+        'method': 'POST',
+        'status': True,
+        'error_message': None
+      },
+      'request_tracer': [
+        {
+          'on_request_start': 287571.681455504,
+          'is_redirect': False,
+          'on_connection_create_start': 0.00041248503839597106,
+          'on_dns_cache_miss': 0.0006613450241275132,
+          'on_dns_resolvehost_start': 0.0006853759987279773,
+          'on_dns_resolvehost_end': 0.0024919320130720735,
+          'on_connection_create_end': 0.08381915499921888,
+          'on_request_chunk_sent': 0.08448734600096941,
+          'on_request_end': 0.5899507160065696
+        }
+      ]
+    },
+    'post_processor_response': {
+      'text': 'final res'
+    }
+  }
+}
+"""
+```
+
+* API call to send file in body
+```python
+from aio_requests.aio_request import request
+from aio_requests.utils.http_file_config import download_file_from_url, delete_local_file_path
+
+
+local_file_path = "/tmp/test.pdf"
+result = await request(
+    url="http://localhost:5000/api/v1/test/aio-request-files",
+    protocol="HTTPS",
+    protocol_info={
+        "request_type": "POST",
+        "http_file_config": {
+            "local_filepath": local_file_path,
+            "file_key": "file"
+        }
+    },
+    pre_processor_config={
+        "function": download_file_from_url,
+        "params": {
+            "file_download_path": "https://s3.ap-south-1.amazonaws.com/fynd-platform-test-mumbai/trell-3000008556-label-1643895203.pdf",
+            "local_filepath": local_file_path
+        }
+    },
+    post_processor_config={
+        "function": delete_local_file_path,
+        "params": {
+            "local_filepath": local_file_path
+        }
+    }
+)
+
+### Value of result
+"""
+{
+  'url': 'http://localhost:5000/api/v1/test/aio-request-files',
+  'payload': {
+    
+  },
+  'external_call_request_time': '2022-02-17 17:13:03.231826+05:30',
+  'text': '',
+  'error_message': '',
+  'pre_processor_response': None,
+  'api_response': {
+    'status_code': 200,
+    'headers': {
+      'Connection': 'close',
+      'Content-Length': '29',
+      'Content-Type': 'application/json'
+    },
+    'cookies': {
+      
+    },
+    'content': b'{"success":true,"message":""}',
+    'text': '{"success":true,"message":""}',
+    'json': {
+      'success': True,
+      'message': ''
+    },
+    'request_tracer': [
+      {
+        'on_request_start': 287033.4935145,
+        'is_redirect': False,
+        'on_connection_create_start': 0.0021707930136471987,
+        'on_dns_cache_miss': 0.002449413004796952,
+        'on_dns_resolvehost_start': 0.002480961033143103,
+        'on_dns_resolvehost_end': 0.003233974042814225,
+        'on_connection_create_end': 0.0042467640014365315,
+        'on_request_chunk_sent': 0.0064254660392180085,
+        'on_request_end': 0.1773580180015415
+      }
+    ]
+  },
+  'post_processor_response': None
+}
+"""
 ```
 
 

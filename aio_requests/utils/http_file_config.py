@@ -33,7 +33,7 @@ async def download_file_from_s3(bucket_name: Text, s3_filepath: Text, local_file
                                       file_save_path=local_filepath)
 
 
-async def download_file_from_url(file_download_path, local_filepath, request_type=None, headers={}, **kwargs):
+async def download_file_from_url(file_download_path, local_filepath, request_type="get", headers={}, **kwargs):
     """Download File from url.
 
     :param file_download_path: complete url from where to download
@@ -42,7 +42,6 @@ async def download_file_from_url(file_download_path, local_filepath, request_typ
     :param headers: API headers if any
     :param kwargs
     """
-    request_type = request_type or "get"
     async with aiohttp.ClientSession(headers=headers) as session:
         request_obj = getattr(session, request_type.lower())
         session_obj = request_obj(file_download_path)
