@@ -139,16 +139,16 @@ res = asyncio.run(
             "last_name": "Pandey",
             "Gender": "M"
         },
-        protocol="HTTP",
+        protocol="HTTPS",
         protocol_info={
             "request_type": "POST",
-            "circuit_breaker_config": {
-                "timeout": 150,
-                "retry_config": {
-                    "name": "asdf",
-                    "allowed_retries": 1
-                }
-            }
+            # "circuit_breaker_config": {
+            #     "timeout": 150,
+            #     "retry_config": {
+            #         "name": "asdf",
+            #         "allowed_retries": 1
+            #     }
+            # }
         }
     )
 )

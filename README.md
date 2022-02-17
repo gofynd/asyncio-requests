@@ -195,6 +195,87 @@ await request(
 )
 ```
 
+* Basic HTTP POST call
+```python
+from aio_request import request
+
+
+await request(
+    url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
+    data={
+        "first_name": "Joy",
+        "last_name": "Pandey",
+        "gender": "M"
+    },
+    protocol="HTTPS",
+    protocol_info={
+        "request_type": "POST"
+    }
+)
+```
+
+* API with some pre and post process enabled with circuit breaker and retrieies
+```python
+from aio_request import request
+from typing import Dict, Text
+
+
+async def make_request_payload(response: Dict, first_name: Text, last_name: Text, gender: Text):
+    response["payload"] = {
+        "first_name": first_name,
+        "last_name": last_name,
+        "gender": gender
+    }
+    return response
+
+
+async def print_response_recieved_from_api(response: Dict, text: Text):
+    print(f"{text}{response['api_response']}")
+    return response
+
+
+await request(
+    url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
+    protocol="HTTPS",
+    protocol_info={
+        "request_type": "POST",
+        "circuit_breaker_config": {
+            "timeout": 150,
+            "retry_config": {
+                "name": "api_retry",
+                "allowed_retries": 4
+            }
+        }
+    },
+    pre_processor_config={
+        "function": make_request_payload,
+        "params": {
+            "first_name": "Joy",
+            "last_name": "Pandey",
+            "gender": "M"
+        }
+    },
+    post_processor_config={
+        "function": print_response_recieved_from_api,
+        "params": {
+            "text": "Response received from API: "
+        }
+    }
+)
+```
+
+* API call with pre and post API call
+```python
+from aio_request import request
+
+
+await request(
+    
+)
+```
+
+
 **Utilities Included**
 * Download a file from AWS S3
-
+* Download a file from public url
+* Delete a local file on system
