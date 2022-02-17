@@ -1,6 +1,4 @@
 import aiohttp
-import aiofiles
-import aiofiles.os
 import time
 import ujson
 
@@ -10,11 +8,18 @@ from aio_requests.utils.constants import HTTP_TIMEOUT
 from aio_requests.helpers.internal import header_filter_mapping
 from aio_requests.helpers.internal import header_response_mapping
 
-from aio_requests.helpers.internal.request_helper import make_http_request, fetch_file
+from aio_requests.helpers.internal.request_helper import make_http_request
 from aio_requests.helpers.internal.circuit_breaker_helper import CircuitBreakerHelper
 
 
 async def http_request(url, auth, response, info=None):
+    """AioHttp Request.
+
+    :param url: url to make http call.
+    :param auth: auth object for ex aiohttp.BasicAuth(username, password)
+    :param response: Dict object with following parameters url, payload, external_call_request_time, text, error_message
+    :param info: protocol_info passed in request function
+    """
     if info is None:
         info = {}
     start_time = time.time()
@@ -42,7 +47,6 @@ async def http_request(url, auth, response, info=None):
     ) as session:
         try:
             if http_file_config:
-                await fetch_file(http_file_config)
                 with open(http_file_config["local_filepath"], "rb") as read_file:  # aiohttp doesnt support
                     filters = {"data": {http_file_config["file_key"]: read_file}}
                     response = await circuit_breaker.failsafe.run(make_http_request, session, url, filters,
@@ -56,6 +60,7 @@ async def http_request(url, auth, response, info=None):
             res_content_type = response["headers"].get("Content-Type", "default").lower()
             response["json"] = await header_response_mapping.get(res_content_type)(response["text"]) if \
                 header_response_mapping.get(res_content_type) else ""
+            response["request_tracer"] = [tc.results_collector for tc in trace_config]
         except Exception as request_error:
             response["status_code"] = 999
             response["latency"] = (time.time() - start_time)

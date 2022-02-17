@@ -4,6 +4,7 @@ from typing import Text
 import aioboto3
 import aiohttp
 import aiofiles
+import os
 
 from .constants import STATUS_CODE_403
 from .exceptions import CustomGlobalException
@@ -61,4 +62,4 @@ async def delete_local_file_path(local_filepath: Text, **kwargs):
     :param local_filepath: file to be deleted
     :param kwargs
     """
-    await aiofiles.os.remove(local_filepath)
+    os.remove(local_filepath)

@@ -4,7 +4,7 @@ from aio_requests.logic import protocol_mapping
 
 async def request(
         url,
-        data,
+        data={},
         auth=None,
         protocol="",
         protocol_info=None,
