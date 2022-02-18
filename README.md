@@ -136,30 +136,33 @@ Defaults -
  
 
 ### How to Use
-* Design the http request payload as per below format     
-```python
-from aio_requests.aio_request import request
+* Design the http request payload as per below format
 
+```python
+import aiohttp
+from aio_requests.aio_request import request
 
 await request(
     url="URL FOR REQUEST",  # str <Required>
     data={
         "key": "val"
-    } or "" # Data to be sent in body as dict or str,
-    auth=auth_object,  # This auth object is to be made by the user itself as there are n number of
-         # auth mechanisms to add to. Eg - auth=aiohttp.BasicAuth(username, password)
-    protocol="REQUEST PROTOCOL", # str <Required> (HTTP/HTTPS)
+    } or "",  # Data to be sent in body as dict or str,
+    auth=aiohttp.BasicAuth('username', 'password'),  # This auth object is to be made by the user itself as there are n number of
+    # auth mechanisms to add to. Eg - auth=aiohttp.BasicAuth(username, password). Its an Optional field.
+    protocol="REQUEST PROTOCOL",  # str <Required> (HTTP/HTTPS)
     protocol_info={
-        "request_type": "GET", #str <Required>
+        "request_type": "GET",  # str <Required>
         "timeout": 15,  # int <Optional> Default - 15
-        "certificate: ('', ''),  #Tuple(str, str) <Optional>,
-        "verify_ssl": True, # Boolean <Optional>,
-        "cookies": "", # str <Optional>,
+        "certificate": ('', ''),  # Tuple(str, str) <Optional>,
+        "verify_ssl": True,  # Boolean <Optional>,
+        "cookies": "",  # str <Optional>,
         "headers": {},  # dict <Optional>,
-        "http_file_config": {  #optional Include only if you want call api with file. If this is included api body will have only file
+        "http_file_config": {
+            # optional Include only if you want call api with file. If this is included api body will have only file
             "local_filepath": "required",  # File path to be sent
             "file_key": "required",  # File to be sent on which key in request body
-            "delete_local_file": "boolean Optional"  # After making API if you want to delete file then add value as True default is false.
+            "delete_local_file": "boolean Optional"
+            # After making API if you want to delete file then add value as True default is false.
         },
         "circuit_breaker_config": {  # Optional
             "maximum_failures": int,  # Optional Failures allowed
@@ -167,30 +170,28 @@ await request(
             "retry_config": {  # Optional Include this if you want retry API calls if failed on first time
                 "name": str,  # Required Any name
                 "allowed_retries": int,  # Required number of retries you want to make 
-                "retriable_exceptions": [Optional list of Exceptions],
-                "abortable_exceptions": [Optional list of Exceptions],
-                "on_retries_exhausted": Optional callable that will be invoked on a retries exhausted event,
-                "on_failed_attempt": Optional callable that will be invoked on a failed attempt event,
-                "on_abort": Optional callable that will be invoked on an abort event,
-                "delay": int seconds of delay between retries Optional default 0,
-                "max_delay": int seconds of max delay between retries Optional default 0,
-                "jitter": Boolean Optional,
-            } 
+                "retriable_exceptions": [<callable object>] # Optional
+                "abortable_exceptions": [<callable object>] # Optional
+                "on_retries_exhausted": <callable object>, # Optional callable that will be invoked on a retries exhausted event,
+                "on_failed_attempt": <callable object>, # Optional callable that will be invoked on a failed attempt event,
+                "on_abort": <callable object>, # Optional callable that will be invoked on an abort event,
+            "delay": int, # seconds of delay between retries Optional default 0,
+            "max_delay": int, # seconds of max delay between retries Optional default 0,
+        "jitter": bool # Boolean Optional,
+            }
         }
     },
-    pre_processor_config={  # Optional
-        "function": function_address, # Required function that you want to call before http call
+    pre_processor_config = {  # Optional
+        "function": <callable function_address>,  # Required function that you want to call before http call
         "params": {  # Optional
-            "param1": "value1"
-            # Params you want to pass in function
-        } 
+            "param1": "value1" # Params you want to pass in function
+        }
     },
-    post_processor_config={  # Optional
-       "function": function_address,  # Required function that you want to call after http call 
-       "params": {
-          "param1": "value1"
-          # Params you want to pass in function
-       }
+    post_processor_config = {  # Optional
+        "function": <callable function_address>,  # Required function that you want to call after http call 
+        "params": {
+            "param1": "value1" # Params you want to pass in function
+        }
     }
 )
 ```
@@ -213,7 +214,7 @@ result = await request(
     }
 )
 
-### Value of result
+### Response
 """
 {
   'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
@@ -309,7 +310,8 @@ result = await request(
     }
 )
 
-### Value of result
+### Response
+### The pre and post processor keys have no values here since they were just print statements. Had they been API calls, the value would have been different.
 """
 {
   'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
@@ -360,7 +362,8 @@ result = await request(
 """
 ```
 
-* API call with pre and post API call
+* Making an API call with separate API calls in pre and post processor.
+* This is usually the case wherein we want to report some data before/after making the actual API call
 ```python
 from aio_requests.aio_request import request
 
@@ -624,7 +627,7 @@ result = await request(
     }
 )
 
-### Value of result
+### Response
 """
 {
   'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
@@ -799,7 +802,7 @@ result = await request(
     }
 )
 
-### Value of result
+### Response
 """
 {
   'url': 'http://localhost:5000/api/v1/test/aio-request-files',
