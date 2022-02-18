@@ -32,20 +32,23 @@ async def request(
             "delete_local_file": "boolean Optional"
         }, #optional,
         "serialization": ujson.dumps, #Optional
-        "circuit_breaker_config" {
+        "circuit_breaker_config": {
             "maximum_failures": "int optional",
             "timeout": "int optional",
             "retry_config": {
                 "name": "str required",
                 "allowed_retries": "int required",
-                "retriable_exceptions": [Optional list of Exceptions],
-                "abortable_exceptions": [Optional list of Exceptions],
+                "retriable_exceptions": [Optional list of Exceptions], list of exception types indicating which
+                    exceptions can cause a retry. If None every exception is considered retriable
+                "abortable_exceptions": [Optional list of Exceptions], list of exception types indicating which
+                    exceptions should abort failsafe run immediately and be propagated out of failsafe. If None, no
+                    exception is considered abortable.
                 "on_retries_exhausted": Optional callable that will be invoked on a retries exhausted event,
                 "on_failed_attempt": Optional callable that will be invoked on a failed attempt event,
                 "on_abort": Optional callable that will be invoked on an abort event,
                 "delay": int seconds of delay between retries Optional default 0,
                 "max_delay": int seconds of max delay between retries Optional default 0,
-                "jitter": Boolean Optional,
+                "jitter": Boolean Optional, False when you want to keep the wait between calls constant else True
             } #Optional Include this if you want retry
         } #Optional
     }

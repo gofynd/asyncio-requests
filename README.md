@@ -107,14 +107,14 @@ This function can be used by other developers in the pre/post processor to downl
                 <ul>
                   <li>name - Str required</li>
                   <li>allowed_retries - Int. Required this is for how many retries you want to perform</li>
-                  <li>retriable_exceptions - List[function address of exception]. Optional. list of Exceptions on which you want to retry.
-                  <li>abortable_exceptions - List[function address of exception]. list of Exceptions on which exception the request to be aborted</li>
+                  <li>retriable_exceptions - List[function address of exception]. Optional. list of exception types indicating which exceptions can cause a retry. If None every exception is considered retriable</li>
+                  <li>abortable_exceptions - List[function address of exception]. Optional. list of exception types indicating which exceptions should abort failsafe run immediately and be propagated out of failsafe. If None, no exception is considered abortable.</li>
                   <li>on_retries_exhausted - function address. Optional. callable/function_address which will be invoked on retry exhausted event</li>
                   <li>on_failed_attempt - function address. Optional. callable/function_address that will be invoked on a failed attempt event</li>
                   <li>on_abort - function address. Optional. callable that will be invoked on an abort event</li>
                   <li>delay - Int Optional. seconds of delay between retries default is 0.</li> 
                   <li>max_delay - Int Optional. seconds of max delay between retries default 0</li>
-                  <li>jitter: Boolean Optional</li>
+                  <li>jitter: Boolean Optional. False when you want to keep the wait between calls constant else True</li>
                 </ul>
               </li>
             </ul>
@@ -361,6 +361,153 @@ result = await request(
 ```
 
 * API call with pre and post API call
+```python
+from aio_requests.aio_request import request
+
+
+class HTTPRequestFailedException(Exception):
+    pass
+
+
+class CustomException(Exception):
+    pass
+
+
+def retry_exhausted_actions():
+    print("All retries exhausted. API call failed.")
+
+
+def request_attempt_failed_actions():
+    print("API call failed.")
+
+
+def request_abort_actions():
+    print("API call aborted")
+
+
+result = await request(
+    url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
+    data={
+        "first_name": "Joy",
+        "last_name": "Pandey",
+        "gender": "M"
+    },
+    protocol="HTTPS",
+    protocol_info={
+        "request_type": "POST"
+    },
+    pre_processor_config={
+        "function": request,
+        "async_enabled": True,
+        "params": {
+            "url": "https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
+            "data": {
+                "first_name": "Joy",
+                "last_name": "Pandey",
+                "Gender": "M"
+            },
+            "protocol": "HTTP",
+            "protocol_info": {
+                "request_type": "POST"
+            }
+        }
+    }
+)
+
+### Value of result
+"""
+{
+  'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
+  'payload': {
+    'first_name': 'Joy',
+    'last_name': 'Pandey',
+    'gender': 'M'
+  },
+  'external_call_request_time': '2022-02-18 13:26:35.575362+05:30',
+  'text': '',
+  'error_message': '',
+  'pre_processor_response': {
+    'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
+    'payload': {
+      'first_name': 'Joy',
+      'last_name': 'Pandey',
+      'Gender': 'M'
+    },
+    'external_call_request_time': '2022-02-18 13:26:35.575469+05:30',
+    'text': '',
+    'error_message': '',
+    'api_response': {
+      'status_code': 200,
+      'headers': {
+        'Date': 'Fri, 18 Feb 2022 07:56:36 GMT',
+        'Content-Type': 'application/json',
+        'Content-Length': '57',
+        'Connection': 'keep-alive',
+        'X-Fynd-Trace-Id': 'ae2703a4c82e8f917c53faded0688717'
+      },
+      'cookies': {
+        
+      },
+      'content': b'{"method": "POST", "status": true, "error_message": null}',
+      'text': '{"method": "POST", "status": true, "error_message": null}',
+      'json': {
+        'method': 'POST',
+        'status': True,
+        'error_message': None
+      },
+      'request_tracer': [
+        {
+          'on_request_start': 354376.993160197,
+          'is_redirect': False,
+          'on_connection_create_start': 0.00041024398524314165,
+          'on_dns_cache_miss': 0.004407248983625323,
+          'on_dns_resolvehost_start': 0.0044287089840509,
+          'on_dns_resolvehost_end': 0.32443026901455596,
+          'on_connection_create_end': 0.44923901598667726,
+          'on_request_chunk_sent': 0.449799319030717,
+          'on_request_end': 0.5300842020078562
+        }
+      ]
+    }
+  },
+  'api_response': {
+    'status_code': 200,
+    'headers': {
+      'Date': 'Fri, 18 Feb 2022 07:56:36 GMT',
+      'Content-Type': 'application/json',
+      'Content-Length': '57',
+      'Connection': 'keep-alive',
+      'X-Fynd-Trace-Id': 'ddb370fbf58999c359fe384b547446c9'
+    },
+    'cookies': {
+      
+    },
+    'content': b'{"method": "POST", "status": true, "error_message": null}',
+    'text': '{"method": "POST", "status": true, "error_message": null}',
+    'json': {
+      'method': 'POST',
+      'status': True,
+      'error_message': None
+    },
+    'request_tracer': [
+      {
+        'on_request_start': 354377.524928869,
+        'is_redirect': False,
+        'on_connection_create_start': 0.000421632023062557,
+        'on_dns_cache_miss': 0.00067474803654477,
+        'on_dns_resolvehost_start': 0.0006999420002102852,
+        'on_dns_resolvehost_end': 0.002583371999207884,
+        'on_connection_create_end': 0.09995210904162377,
+        'on_request_chunk_sent': 0.10060718702152371,
+        'on_request_end': 0.2261603070073761
+      }
+    ]
+  }
+}
+"""
+```
+
+* API call with pre and post API call with nesting
 ```python
 from aio_requests.aio_request import request
 
@@ -694,6 +841,109 @@ result = await request(
     ]
   },
   'post_processor_response': None
+}
+"""
+```
+
+* API call with circuit breaker
+```python
+from aio_requests.aio_request import request
+
+
+class HTTPRequestFailedException(Exception):
+    pass
+
+
+class CustomException(Exception):
+    pass
+
+
+def retry_exhausted_actions():
+    print("All retries exhausted. API call failed.")
+    
+    
+def request_attempt_failed_actions():
+    print("API call failed.")
+    
+    
+def request_abort_actions():
+    print("API call aborted")
+
+
+result = await request(
+    url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
+    data={
+        "first_name": "Joy",
+        "last_name": "Pandey",
+        "gender": "M"
+    },
+    protocol="HTTPS",
+    protocol_info={
+        "request_type": "POST",
+        "circuit_breaker_config": {
+            "maximum_failures": 5,
+            "timeout": 15,
+            "retry_config": {
+                "name": "retry_masquerader",
+                "allowed_retries": 5,
+                "retriable_exceptions": [HTTPRequestFailedException],
+                "abortable_exceptions": [CustomException],
+                "on_retries_exhausted": retry_exhausted_actions,
+                "on_failed_attempt": request_attempt_failed_actions,
+                "on_abort": request_abort_actions,
+                "delay": 5,
+                "max_delay": 300,
+                "jitter": True
+            }
+        }
+    }
+)
+
+### Value of result
+"""
+{
+  'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
+  'payload': {
+    'first_name': 'Joy',
+    'last_name': 'Pandey',
+    'gender': 'M'
+  },
+  'external_call_request_time': '2022-02-18 12:57:20.762713+05:30',
+  'text': '',
+  'error_message': '',
+  'api_response': {
+    'status_code': 200,
+    'headers': {
+      'Date': 'Fri, 18 Feb 2022 07:27:21 GMT',
+      'Content-Type': 'application/json',
+      'Content-Length': '57',
+      'Connection': 'keep-alive',
+      'X-Fynd-Trace-Id': '390cd5e9f4b1f179d5d711ca7bc83ec3'
+    },
+    'cookies': {
+      
+    },
+    'content': b'{"method": "POST", "status": true, "error_message": null}',
+    'text': '{"method": "POST", "status": true, "error_message": null}',
+    'json': {
+      'method': 'POST',
+      'status': True,
+      'error_message': None
+    },
+    'request_tracer': [
+      {
+        'on_request_start': 352622.180567606,
+        'is_redirect': False,
+        'on_connection_create_start': 0.0009668020065873861,
+        'on_dns_cache_miss': 0.07304156001191586,
+        'on_dns_resolvehost_start': 0.07307461701566353,
+        'on_dns_resolvehost_end': 0.31564718199661,
+        'on_connection_create_end': 0.5526716759777628,
+        'on_request_chunk_sent': 0.5531467269756831,
+        'on_request_end': 0.6851100819767453
+      }
+    ]
+  }
 }
 """
 ```
