@@ -192,7 +192,7 @@ await request(
 )
 ```
 
-* Basic HTTP POST call
+* **Basic HTTP POST call**
 ```python
 from aio_requests.aio_request import request
 
@@ -259,7 +259,7 @@ result = await request(
 """
 ```
 
-* API call with circuit breaker and custom exceptions
+* **API call with circuit breaker and custom exceptions**
 ```python
 from aio_requests.aio_request import request
 
@@ -362,7 +362,7 @@ result = await request(
 """
 ```
 
-* API with pre and post processor enabled with circuit breaker and retries.
+* **API with pre and post processor enabled with circuit breaker and retries.**
 ```python
 from aio_requests.aio_request import request
 from typing import Dict, Text
@@ -462,7 +462,7 @@ result = await request(
 """
 ```
 
-* Having separate API call in pre-processor.
+* **Having separate API call in pre-processor.**
 * This is usually the case wherein we want to report some data before making the actual API call
 ```python
 from aio_requests.aio_request import request
@@ -585,7 +585,7 @@ result = await request(
 """
 ```
 
-* API call with pre and post API call with nesting
+* **API call with nested pre and post processors**
 * Here the pre processor(parent) has another pre-processor(child) within it.
 * The response will include all the nested responses in the same fashion as that of the config set
 * The actual flow would be (child pre-processor -> parent pre-processor -> main API call -> parent post-processor -> child post processor)
@@ -863,7 +863,7 @@ result = await request(
 """
 ```
 
-* API call to send file data in body
+* **API call to send a file**
 * Here we are downloading a file in the pre-processor. If the file is already present in the system then you can avoid that pre-processor and directly mention the file address in the local_file_path variable.
 * The file can be downloaded by using the existing pre processor function in the utilities.
 * The Utilities dir has a function that supports file download via url/aws s3.
