@@ -17,7 +17,10 @@ This function can be used by other developers in the pre/post processor to downl
 * Has an inbuilt circuit breaker
 * Currently supports infinite nested depth of pre and post processors
 * Retry Functionality
-* Exceptions can be contributed in the utilities and you can use your own exceptions in the circuit breaker config as well.
+* Exceptions can be contributed in the utilities, and you can use your own exceptions in the circuit breaker config as well.
+* Direct File Upload functionality. ToDo - Multipart(Open for contribution)
+
+Params -
 
 <table>
   <tbody>
@@ -58,9 +61,9 @@ This function can be used by other developers in the pre/post processor to downl
       <td>
         <ul>
           <li>pre processor indicates an action (file download/api call or anything) to be done before making the actual API call.</li>
-          <li>Takes async function address which is executed before making the actual API call - Required</li>
-          <li>Params dictionary where key is parameter to the function passed in pre processor and values is parameter value</li>
-          <li>The function address can be used from the utilities folder which is contributed by all or your own function address.</li>
+          <li>Takes async callable object which is executed before making the actual API call - Required</li>
+          <li>Params dictionary where key is parameter to the callable object passed in pre processor and values is parameter value</li>
+          <li>The callable object/function can be used from the utilities folder which is contributed by all or your own function address.</li>
           <li>You can nest the whole API. Eg - you can pass the address of aio_requests.request function too. The response will be a nested one. (Explained via example down)</li>
         </ul>
       </td>
@@ -72,10 +75,10 @@ This function can be used by other developers in the pre/post processor to downl
       <td>
         <ul>
           <li>post processor indicates an action (file download or delete file or api call or anything) to be done post making the actual API call.</li>
-          <li>function: Takes async function address which is executed after making request - Required</li>
-          <li>Params: Takes dictionary where key is parameter to the function passed in pre processor and values is parameter value</li>
-          <li>similar to pre processor, difference being this is executed after making an API call.</li>
-          <li>Eg - if you want to send the data of a file in the API call and the file needs to be downloaded. You can have a file download pre processor functionand have a file deletion post processor function.</li>
+          <li>function: Takes async callable object/function address which is executed after making request - Required</li>
+          <li>Params: Takes dictionary where key is parameter to the callable object/function passed in pre-processor and values is parameter value</li>
+          <li>similar to pre-processor, difference being this is executed after making an API call.</li>
+          <li>Eg - if you want to send the data of a file in the API call and the file needs to be downloaded. You can have a file download pre-processor function and have a file deletion post processor function.</li>
         </ul>
       </td>
     </tr>
@@ -86,19 +89,19 @@ This function can be used by other developers in the pre/post processor to downl
       <td>
         <ul>
           <li>request_type - Str. Required. GET/PUT/POST/PATCH/DELETE/OPTIONS</li>
-          <li>timeout -      Int. Optional. Default HTTP timeout is 15 seconds. Can be overriden if specified.</li>
+          <li>timeout -      Int. Optional. Default HTTP timeout is 15 seconds. Can be overridden if specified.</li>
           <li>certificate -  Tuple(str, str)  Optional. Used for SSL certificates and expected in the format Tuple('certificate path', 'certificate key path')</li>
           <li>verify_ssl -   Boolean. Optional. SSL is enabled by default</li>
           <li>cookies -      Str. Optional</li>
           <li>headers -      Dict. Required</li>
-          <li>trace_config - List[tracer_function] Optional. request tracer object if want use request tracer default tracer is aiohttp.TraceConfig() - Optional</li>
+          <li>trace_config - List[tracer_callable_object] Optional. default tracer is aiohttp.TraceConfig() - Optional</li>
           <li>
             http_file_config: Dict use this only if you want to send file in request. If you use this config then only file will be sent in request - Optional
             <ul>
               <li>local_filepath: machine file path for file to be sent in request</li>
               <li>file_key: The key in which the file data is to be sent</li>
             </ul>
-          </li>serialization: serializer function address. Optional. If you want to use any json serializer then you can pass here default is ujson.dumps.</li>
+          </li>serialization: serializer callable object. Optional. If you want to use any json serializer then you can pass here default is ujson.dumps.</li>
           <li>circuit_breaker_config - Dict - Optional
             <ul>
               <li>maximum_failures - Int. Optional. maximum failures you want to allow for request default is 5</li>
@@ -107,11 +110,11 @@ This function can be used by other developers in the pre/post processor to downl
                 <ul>
                   <li>name - Str required</li>
                   <li>allowed_retries - Int. Required this is for how many retries you want to perform</li>
-                  <li>retriable_exceptions - List[function address of exception]. Optional. list of exception types indicating which exceptions can cause a retry. If None every exception is considered retriable</li>
-                  <li>abortable_exceptions - List[function address of exception]. Optional. list of exception types indicating which exceptions should abort failsafe run immediately and be propagated out of failsafe. If None, no exception is considered abortable.</li>
-                  <li>on_retries_exhausted - function address. Optional. callable/function_address which will be invoked on retry exhausted event</li>
-                  <li>on_failed_attempt - function address. Optional. callable/function_address that will be invoked on a failed attempt event</li>
-                  <li>on_abort - function address. Optional. callable that will be invoked on an abort event</li>
+                  <li>retriable_exceptions - List[<callable object of exception>]. Optional. list of exception types indicating which exceptions can cause a retry. If None every exception is considered retriable</li>
+                  <li>abortable_exceptions - List[<callable object of exception>]. Optional. list of exception types indicating which exceptions should abort failsafe run immediately and be propagated out of failsafe. If None, no exception is considered abortable.</li>
+                  <li>on_retries_exhausted - callable object. Optional. callable/function_address which will be invoked on retry exhausted event</li>
+                  <li>on_failed_attempt - callable object. Optional. callable/function_address that will be invoked on a failed attempt event</li>
+                  <li>on_abort - callable object. Optional. callable that will be invoked on an abort event</li>
                   <li>delay - Int Optional. seconds of delay between retries default is 0.</li> 
                   <li>max_delay - Int Optional. seconds of max delay between retries default 0</li>
                   <li>jitter: Boolean Optional. False when you want to keep the wait between calls constant else True</li>
@@ -137,6 +140,7 @@ Defaults -
 
 ### How to Use
 * Design the http request payload as per below format
+* Mock url - https://api.fyndx1.de/masquerader/v1/aio-request-test/post is live and open for use.
 
 ```python
 import aiohttp
@@ -182,13 +186,13 @@ await request(
         }
     },
     pre_processor_config = {  # Optional
-        "function": <callable function_address>,  # Required function that you want to call before http call
+        "function": <callable object>,  # Required function that you want to call before http call
         "params": {  # Optional
             "param1": "value1" # Params you want to pass in function
         }
     },
     post_processor_config = {  # Optional
-        "function": <callable function_address>,  # Required function that you want to call after http call 
+        "function": <callable object>,  # Required function that you want to call after http call 
         "params": {
             "param1": "value1" # Params you want to pass in function
         }
@@ -263,7 +267,110 @@ result = await request(
 """
 ```
 
-* API with some pre and post process enabled with circuit breaker and retrieies
+* API call with circuit breaker
+```python
+from aio_requests.aio_request import request
+
+
+class HTTPRequestFailedException(Exception):
+    pass
+
+
+class CustomException(Exception):
+    pass
+
+
+def retry_exhausted_actions():
+    print("All retries exhausted. API call failed.")
+    
+    
+def request_attempt_failed_actions():
+    print("API call failed.")
+    
+    
+def request_abort_actions():
+    print("API call aborted")
+
+
+result = await request(
+    url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
+    data={
+        "first_name": "Joy",
+        "last_name": "Pandey",
+        "gender": "M"
+    },
+    protocol="HTTPS",
+    protocol_info={
+        "request_type": "POST",
+        "circuit_breaker_config": {
+            "maximum_failures": 5,
+            "timeout": 15,
+            "retry_config": {
+                "name": "retry_masquerader",
+                "allowed_retries": 5,
+                "retriable_exceptions": [HTTPRequestFailedException],
+                "abortable_exceptions": [CustomException],
+                "on_retries_exhausted": retry_exhausted_actions,
+                "on_failed_attempt": request_attempt_failed_actions,
+                "on_abort": request_abort_actions,
+                "delay": 5,
+                "max_delay": 300,
+                "jitter": True
+            }
+        }
+    }
+)
+
+### Value of result
+"""
+{
+  'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
+  'payload': {
+    'first_name': 'Joy',
+    'last_name': 'Pandey',
+    'gender': 'M'
+  },
+  'external_call_request_time': '2022-02-18 12:57:20.762713+05:30',
+  'text': '',
+  'error_message': '',
+  'api_response': {
+    'status_code': 200,
+    'headers': {
+      'Date': 'Fri, 18 Feb 2022 07:27:21 GMT',
+      'Content-Type': 'application/json',
+      'Content-Length': '57',
+      'Connection': 'keep-alive',
+      'X-Fynd-Trace-Id': '390cd5e9f4b1f179d5d711ca7bc83ec3'
+    },
+    'cookies': {
+      
+    },
+    'content': b'{"method": "POST", "status": true, "error_message": null}',
+    'text': '{"method": "POST", "status": true, "error_message": null}',
+    'json': {
+      'method': 'POST',
+      'status': True,
+      'error_message': None
+    },
+    'request_tracer': [
+      {
+        'on_request_start': 352622.180567606,
+        'is_redirect': False,
+        'on_connection_create_start': 0.0009668020065873861,
+        'on_dns_cache_miss': 0.07304156001191586,
+        'on_dns_resolvehost_start': 0.07307461701566353,
+        'on_dns_resolvehost_end': 0.31564718199661,
+        'on_connection_create_end': 0.5526716759777628,
+        'on_request_chunk_sent': 0.5531467269756831,
+        'on_request_end': 0.6851100819767453
+      }
+    ]
+  }
+}
+"""
+```
+
+* API with pre and post processor enabled with circuit breaker and retries.
 ```python
 from aio_requests.aio_request import request
 from typing import Dict, Text
@@ -311,7 +418,8 @@ result = await request(
 )
 
 ### Response
-### The pre and post processor keys have no values here since they were just print statements. Had they been API calls, the value would have been different.
+### The pre and post processor keys have no values in response since they were just print statements. Had they been API calls, the value would have been different.
+### The print statements will be printed in the shell if run but won't have its resemblence in the response.
 """
 {
   'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
@@ -362,31 +470,10 @@ result = await request(
 """
 ```
 
-* Making an API call with separate API calls in pre and post processor.
-* This is usually the case wherein we want to report some data before/after making the actual API call
+* Having separate API call in pre-processor.
+* This is usually the case wherein we want to report some data before making the actual API call
 ```python
 from aio_requests.aio_request import request
-
-
-class HTTPRequestFailedException(Exception):
-    pass
-
-
-class CustomException(Exception):
-    pass
-
-
-def retry_exhausted_actions():
-    print("All retries exhausted. API call failed.")
-
-
-def request_attempt_failed_actions():
-    print("API call failed.")
-
-
-def request_abort_actions():
-    print("API call aborted")
-
 
 result = await request(
     url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
@@ -448,9 +535,7 @@ result = await request(
         'Connection': 'keep-alive',
         'X-Fynd-Trace-Id': 'ae2703a4c82e8f917c53faded0688717'
       },
-      'cookies': {
-        
-      },
+      'cookies': {},
       'content': b'{"method": "POST", "status": true, "error_message": null}',
       'text': '{"method": "POST", "status": true, "error_message": null}',
       'json': {
@@ -482,9 +567,7 @@ result = await request(
       'Connection': 'keep-alive',
       'X-Fynd-Trace-Id': 'ddb370fbf58999c359fe384b547446c9'
     },
-    'cookies': {
-      
-    },
+    'cookies': {},
     'content': b'{"method": "POST", "status": true, "error_message": null}',
     'text': '{"method": "POST", "status": true, "error_message": null}',
     'json': {
@@ -511,6 +594,23 @@ result = await request(
 ```
 
 * API call with pre and post API call with nesting
+* Here the pre processor(parent) has another pre-processor(child) within it.
+* The actual flow would be (child pre-processor -> parent pre-processor -> main API call)
+* The response will include all the nested responses in the same fashion as that of the config set
+```
+    parent pre-processor response
+        child pre processor response
+            child's child pre preprocesor response
+                infinite nesting...
+    
+    main api call response
+    
+    parent post-processor response
+        child post processor response
+            child's child post preprocesor response
+                infinite nesting...
+```
+
 ```python
 from aio_requests.aio_request import request
 
@@ -770,7 +870,13 @@ result = await request(
 """
 ```
 
-* API call to send file in body
+* API call to send file data in body
+* Here we are downloading a file in the pre-processor. If the file is already present in the system then you can avoid that pre-processor and directly mention the file address in the local_file_path variable.
+* The file can be downloaded by using the existing pre processor function in the utilities.
+* The Utilities dir has a function that supports file download via url/aws s3.
+* The Utilities dir also has a function to delete a file. If you want to delete teh file post making the API call, use this in the post processor.
+* If you have some other way around to download the file, just pass that function address in the pre processor and include the file address in the local_file_path variable.
+
 ```python
 from aio_requests.aio_request import request
 from aio_requests.utils.http_file_config import download_file_from_url, delete_local_file_path
@@ -848,108 +954,6 @@ result = await request(
 """
 ```
 
-* API call with circuit breaker
-```python
-from aio_requests.aio_request import request
-
-
-class HTTPRequestFailedException(Exception):
-    pass
-
-
-class CustomException(Exception):
-    pass
-
-
-def retry_exhausted_actions():
-    print("All retries exhausted. API call failed.")
-    
-    
-def request_attempt_failed_actions():
-    print("API call failed.")
-    
-    
-def request_abort_actions():
-    print("API call aborted")
-
-
-result = await request(
-    url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
-    data={
-        "first_name": "Joy",
-        "last_name": "Pandey",
-        "gender": "M"
-    },
-    protocol="HTTPS",
-    protocol_info={
-        "request_type": "POST",
-        "circuit_breaker_config": {
-            "maximum_failures": 5,
-            "timeout": 15,
-            "retry_config": {
-                "name": "retry_masquerader",
-                "allowed_retries": 5,
-                "retriable_exceptions": [HTTPRequestFailedException],
-                "abortable_exceptions": [CustomException],
-                "on_retries_exhausted": retry_exhausted_actions,
-                "on_failed_attempt": request_attempt_failed_actions,
-                "on_abort": request_abort_actions,
-                "delay": 5,
-                "max_delay": 300,
-                "jitter": True
-            }
-        }
-    }
-)
-
-### Value of result
-"""
-{
-  'url': 'https://api.fyndx1.de/masquerader/v1/aio-request-test/post',
-  'payload': {
-    'first_name': 'Joy',
-    'last_name': 'Pandey',
-    'gender': 'M'
-  },
-  'external_call_request_time': '2022-02-18 12:57:20.762713+05:30',
-  'text': '',
-  'error_message': '',
-  'api_response': {
-    'status_code': 200,
-    'headers': {
-      'Date': 'Fri, 18 Feb 2022 07:27:21 GMT',
-      'Content-Type': 'application/json',
-      'Content-Length': '57',
-      'Connection': 'keep-alive',
-      'X-Fynd-Trace-Id': '390cd5e9f4b1f179d5d711ca7bc83ec3'
-    },
-    'cookies': {
-      
-    },
-    'content': b'{"method": "POST", "status": true, "error_message": null}',
-    'text': '{"method": "POST", "status": true, "error_message": null}',
-    'json': {
-      'method': 'POST',
-      'status': True,
-      'error_message': None
-    },
-    'request_tracer': [
-      {
-        'on_request_start': 352622.180567606,
-        'is_redirect': False,
-        'on_connection_create_start': 0.0009668020065873861,
-        'on_dns_cache_miss': 0.07304156001191586,
-        'on_dns_resolvehost_start': 0.07307461701566353,
-        'on_dns_resolvehost_end': 0.31564718199661,
-        'on_connection_create_end': 0.5526716759777628,
-        'on_request_chunk_sent': 0.5531467269756831,
-        'on_request_end': 0.6851100819767453
-      }
-    ]
-  }
-}
-"""
-```
 
 
 **Utilities Included**
