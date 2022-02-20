@@ -1,15 +1,7 @@
-# Fynd Async HTTP Request Library
+# Async HTTP Request Library
 
 This library provides the functionality to make async API calls via HTTP / SOAP / FTP protocols via a config.
 
-**Open Source contribution -** 
-
-You can add utilities that can be used by others. 
-
-Eg - Contributing a function that accepts certain params and downloads a file via AWS S3.
-This function can be used by other developers in the pre/post processor to download the file before or after making the API call.
-
-**Make sure to add the utility in the utilities section in the readme wrt protocol.**
 
 ### HTTP
 
@@ -267,7 +259,7 @@ result = await request(
 """
 ```
 
-* API call with circuit breaker
+* API call with circuit breaker and custom exceptions
 ```python
 from aio_requests.aio_request import request
 
@@ -595,8 +587,9 @@ result = await request(
 
 * API call with pre and post API call with nesting
 * Here the pre processor(parent) has another pre-processor(child) within it.
-* The actual flow would be (child pre-processor -> parent pre-processor -> main API call)
 * The response will include all the nested responses in the same fashion as that of the config set
+* The actual flow would be (child pre-processor -> parent pre-processor -> main API call -> parent post-processor -> child post processor)
+* response format will be this way -
 ```
     parent pre-processor response
         child pre processor response
@@ -896,7 +889,7 @@ result = await request(
     pre_processor_config={
         "function": download_file_from_url,
         "params": {
-            "file_download_path": "https://s3.ap-south-1.amazonaws.com/fynd-platform-test-mumbai/trell-3000008556-label-1643895203.pdf",
+            "file_download_path": "https://didukhn.github.io/homepage/assets/img/photo.jpg",
             "local_filepath": local_file_path
         }
     },
@@ -954,9 +947,30 @@ result = await request(
 """
 ```
 
-
-
 **Utilities Included**
 * Download a file from AWS S3
 * Download a file from public url
 * Delete a local file on system
+
+
+
+### SOAP
+(upcoming)
+
+
+### FTP
+(upcoming)
+
+
+**Open Source contribution -** 
+
+You can add utilities that can be used by others. 
+
+Eg - Contributing a function that accepts certain params and downloads a file via AWS S3.
+This function can be used by other developers in the pre/post processor to download the file before or after making the API call.
+
+**Make sure to add the utility in the utilities section in the readme wrt protocol.**
+
+
+To know more about the developer, here's a quote to find him out - 
+```Anton died so we could live```
