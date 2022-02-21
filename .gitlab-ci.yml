@@ -1,0 +1,43 @@
+include: 'https://gitlab.com/api/v4/projects/16759324/repository/files/.gitlab-ci.yml/raw?ref=master&private_token=FjCQxPFMNXJwmaomMoKi&dummy.yml'
+
+.aio_requests_anchor: &aio_requests_anchor
+  before_script:
+    - set -x
+    - python --version
+    - apt-get update -y -qq && apt-get install -y -qq git make openssh-client
+    - eval $(ssh-agent -s)
+    - PRIVATE_KEY=$(curl "https://gitlab.com/api/v4/projects/9905046/repository/files/gitlab%2Fid_rsa/raw?ref=master&private_token=FjCQxPFMNXJwmaomMoKi")
+    - echo "$PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - pip install --upgrade pip
+    - pip install -r "https://gitlab.com/api/v4/projects/16759324/repository/files/requirements-dev.txt/raw?ref=master&private_token=FjCQxPFMNXJwmaomMoKi"
+    - git config --global user.email "arjunsinghyadav@gofynd.com"
+    - git config --global user.name "Arjunsingh Yadav"
+  tags:
+    - docker
+
+stages:
+  - Static Analysis
+  - AIO requests RTD Documentation
+  - Documentation
+  - do
+  - Release Sentry
+  - loadtest
+
+project_pages:
+  stage: AIO Requests RTD Documentation
+  <<: *aio_requests_anchor
+  script:
+    - mkdir -p public/reports/readthedocs/coverage_html
+    - cd docs/
+    - sphinx-apidoc -f -o source/ ../aio_requests
+    - make html
+    - mv build/html/* ../public/reports/readthedocs/coverage_html
+  artifacts:
+    paths:
+      - public
+  only:
+   - master
