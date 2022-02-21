@@ -961,8 +961,15 @@ result = await request(
 ### FTP
 (upcoming)
 
+### Generating Distribution Archives
 
-**Open Source contribution -** 
+```bash
+python3 -m pip install --upgrade setuptools wheel
+python3 setup.py sdist bdist_wheel
+```
+This command should output a lot of text and once completed should generate two files in the `dist` directory.
+
+## Open Source contribution 
 
 You can add utilities that can be used by others. 
 
@@ -971,6 +978,16 @@ This function can be used by other developers in the pre/post processor to downl
 
 **Make sure to add the utility in the utilities section in the readme wrt protocol.**
 
+### Generating New Tags/Release
 
-To know more about the developer, here's a quote to find him out - 
+ - Check the code with flake8, mypy, bandit, pytest before submitting a PR
+ - Update version in [setup.py](setup.py)
+ - Update version in [docs/source/conf.py](docs/source/conf.py)
+ - Update version in README.md section
+ - Send a PR, and after it gets merged to master create a tag from master in the format `vX.Y`
+   - `X` - Major Release (Breaking Changes)
+   - `Y` - Minor Release
+ 
+
+**To know more about the developer, here's a quote to find him out -** 
 ```Anton died so we could live```

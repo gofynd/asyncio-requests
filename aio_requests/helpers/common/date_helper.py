@@ -8,7 +8,7 @@ from aio_requests.utils.constants import TIMEZONE
 timezone = pytz.timezone(TIMEZONE)
 
 
-def get_ist_now(timezone=timezone):
+def get_ist_now(timezone=timezone) -> datetime:
     """Returns Indian Standard Time datetime object.
 
     Returns:

@@ -2,8 +2,12 @@ import aioboto3
 from typing import Text
 
 
-async def download_file_from_s3(local_filepath: Text, bucket_name: Text, s3_filepath: Text, access_key: Text,
-                                secret_key: Text, region: Text):
+async def download_file_from_s3(local_filepath: Text,
+                                bucket_name: Text,
+                                s3_filepath: Text,
+                                access_key: Text,
+                                secret_key: Text,
+                                region: Text):
     """Download file from AWS S3.
 
     :param access_key: S3 access key

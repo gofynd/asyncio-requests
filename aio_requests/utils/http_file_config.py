@@ -10,8 +10,12 @@ from .constants import STATUS_CODE_403
 from .exceptions import CustomGlobalException
 
 
-async def download_file_from_s3(bucket_name: Text, s3_filepath: Text, local_filepath: Text, access_key: Text = None,
-                                secret_key: Text = None, region: Text = None, **kwargs):
+async def download_file_from_s3(bucket_name: Text,
+                                s3_filepath: Text,
+                                local_filepath: Text,
+                                access_key: Text = None,
+                                secret_key: Text = None,
+                                region: Text = None, **kwargs):
     """Download file from AWS S3.
 
     :param access_key: S3 access key
@@ -33,7 +37,11 @@ async def download_file_from_s3(bucket_name: Text, s3_filepath: Text, local_file
                                       file_save_path=local_filepath)
 
 
-async def download_file_from_url(file_download_path, local_filepath, request_type="get", headers={}, **kwargs):
+async def download_file_from_url(
+        file_download_path: Text,
+        local_filepath: Text,
+        request_type: Text = "get",
+        headers=None, **kwargs):
     """Download File from url.
 
     :param file_download_path: complete url from where to download
@@ -42,6 +50,8 @@ async def download_file_from_url(file_download_path, local_filepath, request_typ
     :param headers: API headers if any
     :param kwargs
     """
+    if headers is None:
+        headers = {}
     async with aiohttp.ClientSession(headers=headers) as session:
         request_obj = getattr(session, request_type.lower())
         session_obj = request_obj(file_download_path)
@@ -50,7 +60,10 @@ async def download_file_from_url(file_download_path, local_filepath, request_typ
             if response.status == STATUS_CODE_403:
                 raise CustomGlobalException(
                     contents, STATUS_CODE_403,
-                    error_data={"error_message": "Access to the requested file is forbidden."})
+                    error_data={
+                        "error_message":
+                            "Access to the requested file is forbidden."
+                    })
             async with aiofiles.open(local_filepath, "wb") as file_obj:
                 await file_obj.write(contents)
 

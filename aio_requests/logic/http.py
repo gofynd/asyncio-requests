@@ -9,35 +9,45 @@ from aio_requests.helpers.internal import header_filter_mapping
 from aio_requests.helpers.internal import header_response_mapping
 
 from aio_requests.helpers.internal.request_helper import make_http_request
-from aio_requests.helpers.internal.circuit_breaker_helper import CircuitBreakerHelper
+from aio_requests.helpers.internal.circuit_breaker_helper import \
+    CircuitBreakerHelper
+
+from typing import Text, Dict, Tuple, Any, List, Callable
 
 
-async def http_request(url, auth, response, info=None):
+async def http_request(
+        url: Text,
+        auth,
+        response: Dict,
+        info: Dict = None) -> Dict:
     """AioHttp Request.
 
     :param url: url to make http call.
     :param auth: auth object for ex aiohttp.BasicAuth(username, password)
-    :param response: Dict object with following parameters url, payload, external_call_request_time, text, error_message
+    :param response: Dict object with following parameters url,
+    payload, external_call_request_time, text, error_message
     :param info: protocol_info passed in request function
     """
     if info is None:
         info = {}
     start_time = time.time()
-    timeout = info.get("timeout", HTTP_TIMEOUT)
-    request_type = info["request_type"]
-    certificate = info.get("certificate")
-    verify_ssl = info.get("verify_ssl", True)
-    cookies = info.get("cookies")
-    headers = info.get("headers", {})
-    trace_config = info.get("trace_config", [request_tracer()])
-    http_file_config = info.get("http_file_config", {})
-    serialization = info.get("serialization", ujson.dumps)
-    circuit_breaker_config = info.get("circuit_breaker_config", {})
+    timeout: int = info.get("timeout", HTTP_TIMEOUT)
+    request_type: Text = info["request_type"]
+    certificate: Tuple[Text] = info.get("certificate")
+    verify_ssl: bool = info.get("verify_ssl", True)
+    cookies: Any = info.get("cookies")
+    headers: Dict = info.get("headers", {})
+    trace_config: List[aiohttp.TraceConfig()] = info.get(
+        "trace_config", [request_tracer()])
+    http_file_config: Dict = info.get("http_file_config", {})
+    serialization: Callable = info.get("serialization", ujson.dumps)
+    circuit_breaker_config: Dict = info.get("circuit_breaker_config", {})
 
-    timeout = aiohttp.ClientTimeout(total=timeout)
+    timeout: aiohttp.ClientTimeout = aiohttp.ClientTimeout(total=timeout)
     if circuit_breaker_config.get("retry_config"):
-        retry_policy_dict = circuit_breaker_config["retry_config"]
-        retry_policy = await CircuitBreakerHelper.get_retry_policy(**retry_policy_dict)
+        retry_policy_dict: Dict = circuit_breaker_config["retry_config"]
+        retry_policy = await CircuitBreakerHelper.get_retry_policy(
+            **retry_policy_dict)
         circuit_breaker_config["retry_policy"] = retry_policy
     circuit_breaker = CircuitBreakerHelper(**circuit_breaker_config)
 
@@ -47,20 +57,42 @@ async def http_request(url, auth, response, info=None):
     ) as session:
         try:
             if http_file_config:
-                with open(http_file_config["local_filepath"], "rb") as read_file:  # aiohttp doesnt support
-                    filters = {"data": {http_file_config["file_key"]: read_file}}
-                    response = await circuit_breaker.failsafe.run(make_http_request, session, url, filters,
-                                                                  request_type, certificate=certificate,
-                                                                  verify_ssl=verify_ssl)
+                with open(http_file_config["local_filepath"], "rb") as \
+                        read_file:
+                    filters = {
+                        "data": {http_file_config["file_key"]: read_file}
+                    }
+                    response: Dict = await circuit_breaker.failsafe.run(
+                        make_http_request,
+                        session,
+                        url,
+                        filters,
+                        request_type,
+                        certificate=certificate,
+                        verify_ssl=verify_ssl)
             else:
                 content_type = headers.get("Content-Type", "default").lower()
-                filters = await header_filter_mapping.get(content_type)(response["payload"], request_type=request_type)
-                response = await circuit_breaker.failsafe.run(make_http_request, session, url, filters, request_type,
-                                                              certificate=certificate, verify_ssl=verify_ssl)
-            res_content_type = response["headers"].get("Content-Type", "default").lower()
-            response["json"] = await header_response_mapping.get(res_content_type)(response["text"]) if \
+                filters = await header_filter_mapping.get(
+                    content_type)(
+                    response["payload"],
+                    request_type=request_type
+                )
+                response: Dict = await circuit_breaker.failsafe.run(
+                    make_http_request,
+                    session,
+                    url,
+                    filters,
+                    request_type,
+                    certificate=certificate,
+                    verify_ssl=verify_ssl)
+            res_content_type: Text = response["headers"].get(
+                "Content-Type", "default").lower()
+            response["json"] = await header_response_mapping.get(
+                res_content_type)(response["text"]) if \
                 header_response_mapping.get(res_content_type) else ""
-            response["request_tracer"] = [tc.results_collector for tc in trace_config]
+            response["request_tracer"] = [
+                tc.results_collector for tc in trace_config
+            ]
         except Exception as request_error:
             response["status_code"] = 999
             response["latency"] = (time.time() - start_time)
