@@ -3,7 +3,7 @@
 This library provides the functionality to make async API calls via HTTP / SOAP / FTP protocols via a config.
 
 
-### HTTP
+## HTTP
 
 * Uses aiohttp internally
 * Has an inbuilt circuit breaker
@@ -954,11 +954,11 @@ result = await request(
 
 
 
-### SOAP
+## SOAP
 (upcoming)
 
 
-### FTP
+## FTP
 (upcoming)
 
 ### Generating Distribution Archives
