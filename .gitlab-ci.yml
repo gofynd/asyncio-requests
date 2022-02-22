@@ -162,14 +162,3 @@ pages:
       junit: reports/pytest/coverage_junitxml/index.xml
   only:
     - master
-
-project_pages:
-  stage: AIO Requests RTD Documentation
-  <<: *aio_requests_anchor
-  script:
-
-  artifacts:
-    paths:
-      - public
-  only:
-   - master
