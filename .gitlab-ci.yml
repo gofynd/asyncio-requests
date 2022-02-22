@@ -149,6 +149,11 @@ pages:
       --ini setup.cfg
       --format html . || true
     - mv bandit_index.html public/reports/bandit/coverage_html
+    - mkdir -p public/reports/readthedocs/coverage_html
+    - cd docs/
+    - sphinx-apidoc -f -o source/ ../aio_requests
+    - make html
+    - mv build/html/* ../public/reports/readthedocs/coverage_html
   artifacts:
     when: always
     paths:
@@ -162,11 +167,7 @@ project_pages:
   stage: AIO Requests RTD Documentation
   <<: *aio_requests_anchor
   script:
-    - mkdir -p public/reports/readthedocs/coverage_html
-    - cd docs/
-    - sphinx-apidoc -f -o source/ ../aio_requests
-    - make html
-    - mv build/html/* ../public/reports/readthedocs/coverage_html
+
   artifacts:
     paths:
       - public
