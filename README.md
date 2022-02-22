@@ -1,4 +1,4 @@
-# Async HTTP Request Library
+# Async HTTP / SOAP / FTP Request Library
 
 This library provides the functionality to make async API calls via HTTP / SOAP / FTP protocols via a config.
 
