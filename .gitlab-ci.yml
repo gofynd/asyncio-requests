@@ -107,7 +107,7 @@ pytest:
       junit: reports/pytest/coverage_junitxml/index.xml
 
 pages:
-  stage: Documentation
+  stage: AIO requests RTD Documentation
   <<: *aio_requests_anchor
   script:
     - mkdir -p public/reports/flake8/coverage_txt
