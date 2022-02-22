@@ -20,7 +20,6 @@ stages:
   - Static Analysis
   - AIO requests RTD Documentation
   - do
-  - Release Sentry
   - loadtest
 
 bandit:
@@ -106,59 +105,59 @@ pytest:
     reports:
       junit: reports/pytest/coverage_junitxml/index.xml
 
-pages:
-  stage: AIO requests RTD Documentation
-  <<: *aio_requests_anchor
-  script:
-    - mkdir -p public/reports/flake8/coverage_txt
-    - mkdir -p public/reports/pytest
-    - mkdir -p public/reports/mypy
-    - mkdir -p public/reports/bandit/coverage_html
-    - flake8
-      --count
-      --statistics
-      --output-file=flake8_index.txt
-      --tee
-      --doctests
-      --benchmark
-      --import-order-style google
-      --docstring-convention google
-      --exit-zero
-    - mv flake8_index.txt public/reports/flake8/coverage_txt
-    - pip install -r requirements.txt
-    - pip install -r requirements-dev.txt
-    - pytest -rA
-      --cov-report annotate:reports/pytest/coverage_annotate
-      --cov-report html:reports/pytest/coverage_html
-      --junitxml reports/pytest/coverage_junitxml/index.xml
-      --cov-report xml:reports/pytest/coverage_xml/index.xml
-      --cov-report term-missing
-      --cov-branch
-    - mv reports/pytest public/reports
-    - mypy
-      --pretty
-      --html-report reports/mypy/coverage_html
-      --txt-report reports/mypy/coverage_txt
-      --xml-report reports/mypy/coverage_xml
-      .
-    - mv reports/mypy public/reports
-    - bandit
-      --verbose
-      --recursive
-      --output bandit_index.html
-      --ini setup.cfg
-      --format html . || true
-    - mv bandit_index.html public/reports/bandit/coverage_html
-    - mkdir -p public/reports/readthedocs/coverage_html
-    - cd docs/
-    - sphinx-apidoc -f -o source/ ../aio_requests
-    - make html
-    - mv build/html/* ../public/reports/readthedocs/coverage_html
-  artifacts:
-    when: always
-    paths:
-      - public
-    reports:
-      junit: reports/pytest/coverage_junitxml/index.xml
-  only:
-    - master
+#pages:
+#  stage: AIO requests RTD Documentation
+#  <<: *aio_requests_anchor
+#  script:
+#    - mkdir -p public/reports/flake8/coverage_txt
+#    - mkdir -p public/reports/pytest
+#    - mkdir -p public/reports/mypy
+#    - mkdir -p public/reports/bandit/coverage_html
+#    - flake8
+#      --count
+#      --statistics
+#      --output-file=flake8_index.txt
+#      --tee
+#      --doctests
+#      --benchmark
+#      --import-order-style google
+#      --docstring-convention google
+#      --exit-zero
+#    - mv flake8_index.txt public/reports/flake8/coverage_txt
+#    - pip install -r requirements.txt
+#    - pip install -r requirements-dev.txt
+#    - pytest -rA
+#      --cov-report annotate:reports/pytest/coverage_annotate
+#      --cov-report html:reports/pytest/coverage_html
+#      --junitxml reports/pytest/coverage_junitxml/index.xml
+#      --cov-report xml:reports/pytest/coverage_xml/index.xml
+#      --cov-report term-missing
+#      --cov-branch
+#    - mv reports/pytest public/reports
+#    - mypy
+#      --pretty
+#      --html-report reports/mypy/coverage_html
+#      --txt-report reports/mypy/coverage_txt
+#      --xml-report reports/mypy/coverage_xml
+#      .
+#    - mv reports/mypy public/reports
+#    - bandit
+#      --verbose
+#      --recursive
+#      --output bandit_index.html
+#      --ini setup.cfg
+#      --format html . || true
+#    - mv bandit_index.html public/reports/bandit/coverage_html
+#    - mkdir -p public/reports/readthedocs/coverage_html
+#    - cd docs/
+#    - sphinx-apidoc -f -o source/ ../aio_requests
+#    - make html
+#    - mv build/html/* ../public/reports/readthedocs/coverage_html
+#  artifacts:
+#    when: always
+#    paths:
+#      - public
+#    reports:
+#      junit: reports/pytest/coverage_junitxml/index.xml
+#  only:
+#    - master
