@@ -3,4 +3,4 @@
 
 def test_sample_pre_test():
     """Sample test."""
-    assert True == True
+    assert "True" == "True"
