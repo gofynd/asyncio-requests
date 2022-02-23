@@ -1,8 +1,14 @@
-from failsafe import Backoff, CircuitBreaker, Failsafe, RetryPolicy, Delay
-from aio_requests.utils.constants import CIRCUIT_BREAKER_DELAY, \
-    CIRCUIT_BREAKER_TIMEOUT, CIRCUIT_BREAKER_RETRY, CIRCUIT_BREAKER_MAX_DELAY
-from typing import Optional, Any, Callable, List
+"""Circuit breaker helper."""
+
 from datetime import timedelta
+from typing import Any, Callable, List, Optional
+
+from failsafe import Backoff, CircuitBreaker, Delay, Failsafe, RetryPolicy
+
+from aio_requests.utils.constants import (CIRCUIT_BREAKER_DELAY,
+                                          CIRCUIT_BREAKER_MAX_DELAY,
+                                          CIRCUIT_BREAKER_RETRY,
+                                          CIRCUIT_BREAKER_TIMEOUT)
 
 
 class CircuitBreakerHelper(object):
@@ -10,9 +16,8 @@ class CircuitBreakerHelper(object):
 
     def __init__(self, *args, **kwargs):
         """Initializer for CircuitBreakerHelper."""
-
-        retries = kwargs.get("maximum_failures", None) or CIRCUIT_BREAKER_RETRY
-        timeout = kwargs.get("timeout") or CIRCUIT_BREAKER_TIMEOUT
+        retries = kwargs.get('maximum_failures', None) or CIRCUIT_BREAKER_RETRY
+        timeout = kwargs.get('timeout') or CIRCUIT_BREAKER_TIMEOUT
 
         # circuit breaker
         self.circuit_breaker = CircuitBreaker(
@@ -20,7 +25,7 @@ class CircuitBreakerHelper(object):
             reset_timeout_seconds=timeout)
 
         # retry policy
-        retry_policy = kwargs.get("retry_policy")
+        retry_policy = kwargs.get('retry_policy')
 
         self.failsafe = Failsafe(
             circuit_breaker=self.circuit_breaker,
@@ -30,27 +35,27 @@ class CircuitBreakerHelper(object):
     async def get_retry_policy(
             name: Optional[str],
             **kwargs: Any) -> Optional[RetryPolicy]:
-
-        allowed_retries = kwargs["allowed_retries"]
+        """Get retry policy."""
+        allowed_retries = kwargs['allowed_retries']
         retriable_exceptions: List[Callable] = kwargs.get(
-            "retriable_exceptions", None)
+            'retriable_exceptions', None)
         abortable_exceptions: List[Callable] = kwargs.get(
-            "abortable_exceptions", None)
+            'abortable_exceptions', None)
         on_retries_exhausted: Callable = kwargs.get(
-            "on_retries_exhausted", None)
+            'on_retries_exhausted', None)
         on_failed_attempt: Callable = kwargs.get(
-            "on_failed_attempt", None)
-        on_abort: Callable = kwargs.get("on_abort", None)
+            'on_failed_attempt', None)
+        on_abort: Callable = kwargs.get('on_abort', None)
 
-        delay = kwargs["delay"] if \
-            isinstance(kwargs.get("delay"), int) else \
+        delay = kwargs['delay'] if \
+            isinstance(kwargs.get('delay'), int) else \
             CIRCUIT_BREAKER_DELAY
-        if name == "backoff":
+        if name == 'backoff':
 
-            max_delay: int = kwargs["max_delay"] if \
-                isinstance(kwargs.get("max_delay"), int) else \
+            max_delay: int = kwargs['max_delay'] if \
+                isinstance(kwargs.get('max_delay'), int) else \
                 CIRCUIT_BREAKER_MAX_DELAY
-            jitter: bool = kwargs.get("jitter", False)
+            jitter: bool = kwargs.get('jitter', False)
             backoff = Backoff(
                 delay=timedelta(seconds=delay),
                 max_delay=timedelta(seconds=max_delay),

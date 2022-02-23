@@ -1,22 +1,24 @@
+"""Aio request."""
+
+from typing import Dict, Optional, Text
+
 from aio_requests.helpers.common.date_helper import get_ist_now
 from aio_requests.logic import protocol_mapping
-
-from typing import Text, Dict, Optional
 
 
 async def request(
         url: Text,
         data: Optional[Text, Dict] = None,
         auth: object = None,
-        protocol: Text = "",
+        protocol: Text = '',
         protocol_info: Dict = None,
         pre_processor_config: Dict = None,
         post_processor_config: Dict = None,
         **kwargs
 ) -> Dict:
-    """Multiple protocols calls with pre-processor,
-        post processor and retry support.
+    """Multiple protocols.
 
+     calls with pre-processor, post processor and retry support.
     :param url: URL to call
     :param data: Data to be sent in calls
     :param protocol: values HTTP/HTTPS
@@ -80,31 +82,31 @@ async def request(
         data = {}
 
     response: Dict = {
-        "url": url,
-        "payload": data,
-        "external_call_request_time": str(get_ist_now()),
-        "text": "",
-        "error_message": "",
+        'url': url,
+        'payload': data,
+        'external_call_request_time': str(get_ist_now()),
+        'text': '',
+        'error_message': '',
     }
 
     if not protocol_mapping.get(protocol.upper()):
-        response["error_message"] = "No Protocol Specified"
+        response['error_message'] = 'No Protocol Specified'
         return response
 
     if pre_processor_config:
-        response["pre_processor_response"]: Dict = await \
-            pre_processor_config["function"](response=response,
+        response['pre_processor_response']: Dict = await \
+            pre_processor_config['function'](response=response,
                                              **pre_processor_config.get(
-                                                 "params",
+                                                 'params',
                                                  {}))
 
-    response["api_response"]: Dict = await \
+    response['api_response']: Dict = await \
         protocol_mapping[protocol](url, auth, response, info=protocol_info)
 
     if post_processor_config:
-        response["post_processor_response"]: Dict = \
-            await post_processor_config["function"](
+        response['post_processor_response']: Dict = \
+            await post_processor_config['function'](
                 response=response,
                 **post_processor_config.get(
-                    "params", {}))
+                    'params', {}))
     return response

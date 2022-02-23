@@ -1,5 +1,8 @@
-import aioboto3
+"""File helper."""
+
 from typing import Text
+
+import aioboto3
 
 
 async def download_file_from_s3(local_filepath: Text,
@@ -18,7 +21,7 @@ async def download_file_from_s3(local_filepath: Text,
     :param local_filepath: local filepath where the file will be saved.
     """
     client = aioboto3.client(
-        "s3",
+        's3',
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key,
         region_name=region)

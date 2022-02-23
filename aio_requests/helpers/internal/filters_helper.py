@@ -1,16 +1,20 @@
-import aiohttp
-import ssl
-import ujson
+"""Filters Helper."""
 
-from typing import Tuple, Text, Dict, Optional
+import ssl
+from typing import Dict, Optional, Text, Tuple
+
+import aiohttp
+import ujson
 
 
 async def get_ssl_config(
         certificate: Tuple[Text] = None,
         verify_ssl: bool = None) -> Dict:
     """Get the SSL config.
-    certificate: Tuple[Text] - ('certificate path', 'certificate key path')
-    verify_ssl: bool - Flag to enable ssl verification
+
+    :param certificate: Tuple[Text] - ('certificate path',
+        'certificate key path')
+    :param verify_ssl: bool - Flag to enable ssl verification
     """
     # verify_ssl, ssl_context, fingerprint and ssl parameters
     # are mutually exclusive
@@ -22,36 +26,38 @@ async def get_ssl_config(
         ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         ssl_context.load_cert_chain(certificate[0], certificate[1])
         return {
-            "ssl_context": ssl_context
+            'ssl_context': ssl_context
         }
     return {
-        "ssl": verify_ssl or True
+        'ssl': verify_ssl or True
     }
 
 
 async def form_x_www_form_urlencoded_filters(data: Dict, **kwargs) -> Dict:
-    """Make filters for the API to be hit if the header
+    """Make filters for the API to be hit if the header.
+
     is application/x-www-form-urlencoded
-    data: Dict - data to be hit in the API.
+    :param data: Dict - data to be hit in the API.
     """
     form_data = aiohttp.FormData()
     for form_key, form_value in data.items():
         value = ujson.dumps(form_value) if \
             isinstance(form_value, dict) else form_value
         form_data.add_field(form_key, value)
-    filters = {"data": form_data}
+    filters = {'data': form_data}
     return filters
 
 
 async def application_json_filters(data: Optional[Dict, Text], **kwargs) \
         -> Dict:
-    """Make filters for the API to be hit if the header is application/json
-        data: Dict or Text - data to be hit in the API.
-        """
+    """Make filters for the API to be hit if the header is application/json.
+
+    :param data: Dict or Text - data to be hit in the API.
+    """
     filters = {}
-    request_type: Text = kwargs["request_type"]
-    http_file_config: Dict = kwargs.get("http_file_config")
-    if request_type == "GET":
+    request_type: Text = kwargs['request_type']
+    http_file_config: Dict = kwargs.get('http_file_config')
+    if request_type == 'GET':
         if http_file_config:
             pass
         else:
@@ -62,12 +68,12 @@ async def application_json_filters(data: Optional[Dict, Text], **kwargs) \
                         key in data if type(data[key]) in [bool]
                     }
                 )
-                filters = {"params": data}
+                filters = {'params': data}
     else:
         if isinstance(data, dict):
-            filters = {"json": data}
+            filters = {'json': data}
         else:
             if not isinstance(data, str):
                 data = ujson.dumps(data)
-            filters = {"data": data}
+            filters = {'data': data}
     return filters
