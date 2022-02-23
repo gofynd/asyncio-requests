@@ -1,10 +1,11 @@
 """Http file config utils."""
 
-from typing import Text
-import aioboto3
-import aiohttp
-import aiofiles
 import os
+from typing import Text
+
+import aioboto3
+import aiofiles
+import aiohttp
 
 from .constants import STATUS_CODE_403
 from .exceptions import CustomGlobalException
@@ -27,7 +28,7 @@ async def download_file_from_s3(bucket_name: Text,
     :param kwargs
     """
     client = aioboto3.client(
-        "s3",
+        's3',
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key,
         region_name=region)
@@ -40,7 +41,7 @@ async def download_file_from_s3(bucket_name: Text,
 async def download_file_from_url(
         file_download_path: Text,
         local_filepath: Text,
-        request_type: Text = "get",
+        request_type: Text = 'get',
         headers=None, **kwargs):
     """Download File from url.
 
@@ -61,10 +62,10 @@ async def download_file_from_url(
                 raise CustomGlobalException(
                     contents, STATUS_CODE_403,
                     error_data={
-                        "error_message":
-                            "Access to the requested file is forbidden."
+                        'error_message':
+                            'Access to the requested file is forbidden.'
                     })
-            async with aiofiles.open(local_filepath, "wb") as file_obj:
+            async with aiofiles.open(local_filepath, 'wb') as file_obj:
                 await file_obj.write(contents)
 
 

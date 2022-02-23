@@ -1,5 +1,7 @@
+"""Constants."""
+
 HTTP_TIMEOUT = 15
-TIMEZONE = "Asia/Kolkata"
+TIMEZONE = 'Asia/Kolkata'
 
 STATUS_CODE_403 = 403
 
