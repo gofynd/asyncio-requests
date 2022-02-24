@@ -1,9 +1,10 @@
 """Filters Helper."""
 
+import aiohttp
+
 import ssl
 from typing import Dict, Optional, Text, Tuple, Union
 
-import aiohttp
 import ujson
 
 
