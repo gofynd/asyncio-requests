@@ -8,7 +8,7 @@ from aio_requests.logic import protocol_mapping
 
 async def request(
         url: Text,
-        data: Optional[Text, Dict] = None,
+        data: Optional[Dict] = None,
         auth: object = None,
         protocol: Text = '',
         protocol_info: Dict = None,

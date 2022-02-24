@@ -48,7 +48,7 @@ async def form_x_www_form_urlencoded_filters(data: Dict, **kwargs) -> Dict:
     return filters
 
 
-async def application_json_filters(data: Optional[Dict, Text], **kwargs) \
+async def application_json_filters(data: Optional[Dict], **kwargs) \
         -> Dict:
     """Make filters for the API to be hit if the header is application/json.
 
