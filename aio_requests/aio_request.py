@@ -1,6 +1,6 @@
 """Aio request."""
 
-from typing import Dict, Optional, Text
+from typing import Dict, Optional, Text, Union
 
 from aio_requests.helpers.common.date_helper import get_ist_now
 from aio_requests.logic import protocol_mapping
@@ -8,7 +8,7 @@ from aio_requests.logic import protocol_mapping
 
 async def request(
         url: Text,
-        data: Optional[Dict] = None,
+        data: Optional[Union[Dict, Text]] = None,
         auth: object = None,
         protocol: Text = '',
         protocol_info: Dict = None,
