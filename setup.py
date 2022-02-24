@@ -11,7 +11,7 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setup(
-    name='aio_requests',
+    name='asyncio-requests',
     version='0.1rc1',
     author='Arjunsingh Yadav',
     author_email='arjunsinghyadav@fynd.com',
