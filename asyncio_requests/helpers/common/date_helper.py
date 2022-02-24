@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytz
 
-from aio_requests.utils.constants import TIMEZONE
+from asyncio_requests.utils.constants import TIMEZONE
 
 timezone = pytz.timezone(TIMEZONE)
 

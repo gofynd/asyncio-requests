@@ -3,7 +3,7 @@
 from setuptools import find_packages
 from setuptools import setup
 
-description = ('Any microservice will be able to use the “aio_requests” '
+description = ('Any microservice will be able to use the “asyncio_requests” '
                'can make an async request(HTTP/SOAP/XML/FTP/redis) '
                'with the given payload to given address')
 

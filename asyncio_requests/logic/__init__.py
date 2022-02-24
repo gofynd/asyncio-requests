@@ -1,6 +1,6 @@
 """Logic."""
 
-from aio_requests.logic.http import http_request
+from asyncio_requests.logic.http import http_request
 
 protocol_mapping = {
     'HTTP': http_request,

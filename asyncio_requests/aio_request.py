@@ -2,8 +2,8 @@
 
 from typing import Dict, Optional, Text, Union
 
-from aio_requests.helpers.common.date_helper import get_ist_now
-from aio_requests.logic import protocol_mapping
+from asyncio_requests.helpers.common.date_helper import get_ist_now
+from asyncio_requests.logic import protocol_mapping
 
 
 async def request(

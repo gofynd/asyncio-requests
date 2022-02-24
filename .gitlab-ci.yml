@@ -148,7 +148,7 @@ pages:
     - mv bandit_index.html public/reports/bandit/coverage_html
     - mkdir -p public/reports/readthedocs/coverage_html
     - cd docs/
-    - sphinx-apidoc -f -o source/ ../aio_requests
+    - sphinx-apidoc -f -o source/ ../asyncio_requests
     - make html
     - mv build/html/* ../public/reports/readthedocs/coverage_html
   artifacts:

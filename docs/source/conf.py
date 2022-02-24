@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'aio_requests'
+project = 'asyncio_requests'
 copyright = '2021, Arjunsingh Yadav'  # noqa A001
 author = 'Arjunsingh Yadav'
 
