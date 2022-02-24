@@ -1,0 +1,161 @@
+image: "python:3.10-slim-buster"
+
+.aio_requests_anchor: &aio_requests_anchor
+  before_script:
+    - set -x
+    - python --version
+    - apt-get update -y -qq && apt-get install -y -qq git make openssh-client
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - pip install --upgrade pip==22.0.3
+    - pip install -r "https://gitlab.com/api/v4/projects/33941878/repository/files/requirements-dev.txt/raw?ref=main"
+    - git config --global user.email "arjunsinghyadav@gofynd.com"
+    - git config --global user.name "Arjunsingh Yadav"
+  tags:
+    - docker
+
+stages:
+  - Static Analysis
+  - AIO requests RTD Documentation
+
+bandit:
+  stage: Static Analysis
+  <<: *aio_requests_anchor
+  script:
+    - bandit
+      --verbose
+      --recursive
+      --output bandit_index.html
+      --ini setup.cfg
+      --format html . || true
+  only:
+    - merge_requests
+  artifacts:
+    paths:
+      - bandit_index.html
+
+flake8:
+  stage: Static Analysis
+  <<: *aio_requests_anchor
+  script:
+    - git pull origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME --allow-unrelated-histories
+    - git pull origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - git diff --unified=0 origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME..origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - git diff --unified=0 origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME..origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME | flake8
+      --count
+      --diff
+      --statistics
+      --output-file=flake8_index.txt
+      --tee
+      --doctests
+      --benchmark
+      --import-order-style google
+      --docstring-convention google
+  only:
+    - merge_requests
+  artifacts:
+    paths:
+      - flake8_index.txt
+
+mypy:
+  stage: Static Analysis
+  <<: *aio_requests_anchor
+  script:
+    - pip install -r requirements.txt
+    - pip install -r requirements-dev.txt
+    - mypy
+      --pretty
+      --html-report reports/mypy/coverage_html
+      --txt-report reports/mypy/coverage_txt
+      --xml-report reports/mypy/coverage_xml
+      .
+  only:
+    - merge_requests
+  artifacts:
+    paths:
+      - reports/mypy/coverage_html
+      - reports/mypy/coverage_txt
+      - reports/mypy/coverage_xml
+
+pytest:
+  stage: Static Analysis
+  <<: *aio_requests_anchor
+  script:
+    - pip install -r requirements.txt
+    - pip install -r requirements-dev.txt
+    - pytest -rA
+      --cov-report annotate:reports/pytest/coverage_annotate
+      --cov-report html:reports/pytest/coverage_html
+      --junitxml reports/pytest/coverage_junitxml/index.xml
+      --cov-report xml:reports/pytest/coverage_xml/index.xml
+      --cov-report term-missing
+      --cov-branch
+  only:
+    - merge_requests
+  artifacts:
+    paths:
+      - reports/pytest/coverage_annotate
+      - reports/pytest/coverage_html
+      - reports/pytest/coverage_junitxml/index.xml
+      - reports/pytest/coverage_xml/index.xml
+    reports:
+      junit: reports/pytest/coverage_junitxml/index.xml
+
+pages:
+  stage: AIO requests RTD Documentation
+  <<: *aio_requests_anchor
+  script:
+    - mkdir -p public/reports/flake8/coverage_txt
+    - mkdir -p public/reports/pytest
+    - mkdir -p public/reports/mypy
+    - mkdir -p public/reports/bandit/coverage_html
+    - flake8
+      --count
+      --statistics
+      --output-file=flake8_index.txt
+      --tee
+      --doctests
+      --benchmark
+      --import-order-style google
+      --docstring-convention google
+      --exit-zero
+    - mv flake8_index.txt public/reports/flake8/coverage_txt
+    - pip install -r requirements.txt
+    - pip install -r requirements-dev.txt
+    - pytest -rA
+      --cov-report annotate:reports/pytest/coverage_annotate
+      --cov-report html:reports/pytest/coverage_html
+      --junitxml reports/pytest/coverage_junitxml/index.xml
+      --cov-report xml:reports/pytest/coverage_xml/index.xml
+      --cov-report term-missing
+      --cov-branch
+    - mv reports/pytest public/reports
+    - mypy
+      --pretty
+      --html-report reports/mypy/coverage_html
+      --txt-report reports/mypy/coverage_txt
+      --xml-report reports/mypy/coverage_xml
+      .
+    - mv reports/mypy public/reports
+    - bandit
+      --verbose
+      --recursive
+      --output bandit_index.html
+      --ini setup.cfg
+      --format html . || true
+    - mv bandit_index.html public/reports/bandit/coverage_html
+    - mkdir -p public/reports/readthedocs/coverage_html
+    - cd docs/
+    - sphinx-apidoc -f -o source/ ../aio_requests
+    - make html
+    - mv build/html/* ../public/reports/readthedocs/coverage_html
+  artifacts:
+    when: always
+    paths:
+      - public
+    reports:
+      junit: reports/pytest/coverage_junitxml/index.xml
+  only:
+    - master
