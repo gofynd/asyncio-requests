@@ -11,7 +11,7 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setup(
-    name='aio_requests',
+    name='asyncio-requests',
     version='0.1rc1',
     author='Arjunsingh Yadav',
     author_email='arjunsinghyadav@fynd.com',
@@ -19,9 +19,10 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://gitlab.com/fynd/ops-engg/libraries/aio-requests',
+    download_url='https://github.com/gofynd/aio-requests/archive/refs/tags/v0.1rc1.tar.gz',  # noqa E251
     packages=find_packages(
         exclude=('local_development', 'tests*', 'docs')),
-    license='',
+    license='MIT',
     install_requires=[
         'aiohttp==3.8.1',
         'ujson==5.1.0',
@@ -33,6 +34,10 @@ setup(
         'pytz==2021.3'
     ],
     classifiers=[
-        'Programming Language :: Python :: 3.8'
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Build Tools',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3.10'
     ],
 )
