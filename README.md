@@ -2,6 +2,8 @@
 
 This library provides the functionality to make async API calls via HTTP / SOAP / FTP protocols via a config.
 
+### Installation
+```pip install asyncio-requests ```
 
 ## HTTP
 

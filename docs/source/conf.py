@@ -20,11 +20,11 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'asyncio_requests'
-copyright = '2021, Arjunsingh Yadav'  # noqa A001
+copyright = '2022, Fynd'  # noqa A001
 author = 'Arjunsingh Yadav'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1rc1'
+release = '1.0'
 
 
 # -- General configuration ---------------------------------------------------
