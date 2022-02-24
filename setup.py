@@ -19,8 +19,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://gitlab.com/fynd/ops-engg/libraries/aio-requests',
-    download_url=
-    'https://github.com/gofynd/aio-requests/archive/refs/tags/v0.1rc1.tar.gz',
+    download_url='https://github.com/gofynd/aio-requests/archive/refs/tags/v0.1rc1.tar.gz',  # noqa E251
     packages=find_packages(
         exclude=('local_development', 'tests*', 'docs')),
     license='MIT',
