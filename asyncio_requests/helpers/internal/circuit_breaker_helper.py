@@ -7,7 +7,6 @@ from asyncio_requests.utils.constants import (CIRCUIT_BREAKER_DELAY,
                                               CIRCUIT_BREAKER_MAX_DELAY,
                                               CIRCUIT_BREAKER_RETRY,
                                               CIRCUIT_BREAKER_TIMEOUT)
-
 from failsafe import Backoff, CircuitBreaker, Delay, Failsafe, RetryPolicy
 
 
