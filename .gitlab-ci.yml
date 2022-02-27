@@ -1,6 +1,6 @@
 image: "python:3.10-slim-buster"
 
-.aio_requests_anchor: &aio_requests_anchor
+.asyncio_requests_anchor: &asyncio_requests_anchor
   before_script:
     - set -x
     - python --version
@@ -22,7 +22,7 @@ stages:
 
 bandit:
   stage: Static Analysis
-  <<: *aio_requests_anchor
+  <<: *asyncio_requests_anchor
   script:
     - bandit
       --verbose
@@ -38,7 +38,7 @@ bandit:
 
 flake8:
   stage: Static Analysis
-  <<: *aio_requests_anchor
+  <<: *asyncio_requests_anchor
   script:
     - git pull origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME --allow-unrelated-histories
     - git pull origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
@@ -61,7 +61,7 @@ flake8:
 
 mypy:
   stage: Static Analysis
-  <<: *aio_requests_anchor
+  <<: *asyncio_requests_anchor
   script:
     - pip install -r requirements.txt
     - pip install -r requirements-dev.txt
@@ -81,7 +81,7 @@ mypy:
 
 pytest:
   stage: Static Analysis
-  <<: *aio_requests_anchor
+  <<: *asyncio_requests_anchor
   script:
     - pip install -r requirements.txt
     - pip install -r requirements-dev.txt
@@ -105,7 +105,7 @@ pytest:
 
 pages:
   stage: AIO requests RTD Documentation
-  <<: *aio_requests_anchor
+  <<: *asyncio_requests_anchor
   script:
     - mkdir -p public/reports/flake8/coverage_txt
     - mkdir -p public/reports/pytest
