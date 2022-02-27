@@ -4,15 +4,14 @@ import time
 from typing import Any, Callable, Dict, List, Text, Tuple
 
 import aiohttp
-import ujson
-
-from aio_requests.helpers.internal import header_filter_mapping
-from aio_requests.helpers.internal import header_response_mapping
-from aio_requests.helpers.internal.circuit_breaker_helper import \
+from asyncio_requests.helpers.internal import header_filter_mapping
+from asyncio_requests.helpers.internal import header_response_mapping
+from asyncio_requests.helpers.internal.circuit_breaker_helper import \
     CircuitBreakerHelper
-from aio_requests.helpers.internal.request_helper import make_http_request
-from aio_requests.utils.constants import HTTP_TIMEOUT
-from aio_requests.utils.request_tracer import request_tracer
+from asyncio_requests.helpers.internal.request_helper import make_http_request
+from asyncio_requests.utils.constants import HTTP_TIMEOUT
+from asyncio_requests.utils.request_tracer import request_tracer
+import ujson
 
 
 async def http_request(

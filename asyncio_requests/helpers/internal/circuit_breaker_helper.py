@@ -3,12 +3,11 @@
 from datetime import timedelta
 from typing import Any, Callable, List, Optional
 
+from asyncio_requests.utils.constants import (CIRCUIT_BREAKER_DELAY,
+                                              CIRCUIT_BREAKER_MAX_DELAY,
+                                              CIRCUIT_BREAKER_RETRY,
+                                              CIRCUIT_BREAKER_TIMEOUT)
 from failsafe import Backoff, CircuitBreaker, Delay, Failsafe, RetryPolicy
-
-from aio_requests.utils.constants import (CIRCUIT_BREAKER_DELAY,
-                                          CIRCUIT_BREAKER_MAX_DELAY,
-                                          CIRCUIT_BREAKER_RETRY,
-                                          CIRCUIT_BREAKER_TIMEOUT)
 
 
 class CircuitBreakerHelper(object):

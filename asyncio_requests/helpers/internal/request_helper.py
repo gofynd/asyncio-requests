@@ -4,9 +4,8 @@ from typing import Dict, Text
 
 import aiofiles
 import aiohttp
-
-from aio_requests.helpers.common.file_helper import download_file_from_s3
-from aio_requests.helpers.internal.filters_helper import get_ssl_config
+from asyncio_requests.helpers.common.file_helper import download_file_from_s3
+from asyncio_requests.helpers.internal.filters_helper import get_ssl_config
 
 
 async def fetch_file(file_config: Dict):

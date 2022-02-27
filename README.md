@@ -2,6 +2,8 @@
 
 This library provides the functionality to make async API calls via HTTP / SOAP / FTP protocols via a config.
 
+### Installation
+```pip install asyncio-requests ```
 
 ## HTTP
 
@@ -56,7 +58,7 @@ Params -
           <li>Takes async callable object which is executed before making the actual API call - Required</li>
           <li>Params dictionary where key is parameter to the callable object passed in pre processor and values is parameter value</li>
           <li>The callable object/function can be used from the utilities folder which is contributed by all or your own function address.</li>
-          <li>You can nest the whole API. Eg - you can pass the address of aio_requests.request function too. The response will be a nested one. (Explained via example down)</li>
+          <li>You can nest the whole API. Eg - you can pass the address of asyncio_requests.request function too. The response will be a nested one. (Explained via example down)</li>
         </ul>
       </td>
     </tr>
@@ -136,7 +138,7 @@ Defaults -
 
 ```python
 import aiohttp
-from aio_requests.aio_request import request
+from asyncio_requests.aio_request import request
 
 await request(
     url="URL FOR REQUEST",  # str <Required>
@@ -194,7 +196,7 @@ await request(
 
 * **Basic HTTP POST call**
 ```python
-from aio_requests.aio_request import request
+from asyncio_requests.aio_request import request
 
 
 result = await request(
@@ -261,7 +263,7 @@ result = await request(
 
 * **API call with circuit breaker and custom exceptions**
 ```python
-from aio_requests.aio_request import request
+from asyncio_requests.aio_request import request
 
 
 class HTTPRequestFailedException(Exception):
@@ -364,7 +366,7 @@ result = await request(
 
 * **API with pre and post processor enabled with circuit breaker and retries.**
 ```python
-from aio_requests.aio_request import request
+from asyncio_requests.aio_request import request
 from typing import Dict, Text
 
 
@@ -465,7 +467,7 @@ result = await request(
 * **Having separate API call in pre-processor.**
 * This is usually the case wherein we want to report some data before making the actual API call
 ```python
-from aio_requests.aio_request import request
+from asyncio_requests.aio_request import request
 
 result = await request(
     url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
@@ -605,7 +607,7 @@ result = await request(
 ```
 
 ```python
-from aio_requests.aio_request import request
+from asyncio_requests.aio_request import request
 
 
 async def test_fun(*args, **kwargs):
@@ -871,8 +873,8 @@ result = await request(
 * If you have some other way around to download the file, just pass that function address in the pre processor and include the file address in the local_file_path variable.
 
 ```python
-from aio_requests.aio_request import request
-from aio_requests.utils.http_file_config import download_file_from_url, delete_local_file_path
+from asyncio_requests.aio_request import request
+from asyncio_requests.utils.http_file_config import download_file_from_url, delete_local_file_path
 
 
 local_file_path = "/tmp/test.pdf"

@@ -1,8 +1,8 @@
 """Internal."""
 
-from aio_requests.helpers.internal.filters_helper import \
+from asyncio_requests.helpers.internal.filters_helper import \
     application_json_filters, form_x_www_form_urlencoded_filters
-from aio_requests.helpers.internal.response_helper import \
+from asyncio_requests.helpers.internal.response_helper import \
     application_json_response
 
 header_filter_mapping = {

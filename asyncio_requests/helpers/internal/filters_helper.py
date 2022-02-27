@@ -1,9 +1,10 @@
 """Filters Helper."""
 
-import ssl
-from typing import Dict, Optional, Text, Tuple
-
 import aiohttp
+
+import ssl
+from typing import Dict, Optional, Text, Tuple, Union
+
 import ujson
 
 
@@ -48,8 +49,8 @@ async def form_x_www_form_urlencoded_filters(data: Dict, **kwargs) -> Dict:
     return filters
 
 
-async def application_json_filters(data: Optional[Dict, Text], **kwargs) \
-        -> Dict:
+async def application_json_filters(
+        data: Optional[Union[Dict, Text]], **kwargs) -> Dict:
     """Make filters for the API to be hit if the header is application/json.
 
     :param data: Dict or Text - data to be hit in the API.
