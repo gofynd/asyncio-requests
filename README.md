@@ -138,7 +138,7 @@ Defaults -
 
 ```python
 import aiohttp
-from asyncio_requests.asyncio_requests import request
+from asyncio_requests.asyncio_request import request
 
 await request(
     url="URL FOR REQUEST",  # str <Required>
@@ -196,7 +196,7 @@ await request(
 
 * **Basic HTTP POST call**
 ```python
-from asyncio_requests.asyncio_requests import request
+from asyncio_requests.asyncio_request import request
 
 
 result = await request(
@@ -263,7 +263,7 @@ result = await request(
 
 * **API call with circuit breaker and custom exceptions**
 ```python
-from asyncio_requests.asyncio_requests import request
+from asyncio_requests.asyncio_request import request
 
 
 class HTTPRequestFailedException(Exception):
@@ -366,7 +366,7 @@ result = await request(
 
 * **API with pre and post processor enabled with circuit breaker and retries.**
 ```python
-from asyncio_requests.asyncio_requests import request
+from asyncio_requests.asyncio_request import request
 from typing import Dict, Text
 
 
@@ -467,7 +467,7 @@ result = await request(
 * **Having separate API call in pre-processor.**
 * This is usually the case wherein we want to report some data before making the actual API call
 ```python
-from asyncio_requests.asyncio_requests import request
+from asyncio_requests.asyncio_request import request
 
 result = await request(
     url="https://api.fyndx1.de/masquerader/v1/aio-request-test/post",
@@ -607,7 +607,7 @@ result = await request(
 ```
 
 ```python
-from asyncio_requests.asyncio_requests import request
+from asyncio_requests.asyncio_request import request
 
 
 async def test_fun(*args, **kwargs):
@@ -873,7 +873,7 @@ result = await request(
 * If you have some other way around to download the file, just pass that function address in the pre processor and include the file address in the local_file_path variable.
 
 ```python
-from asyncio_requests.asyncio_requests import request
+from asyncio_requests.asyncio_request import request
 from asyncio_requests.utils.http_file_config import download_file_from_url, delete_local_file_path
 
 
