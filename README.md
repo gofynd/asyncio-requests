@@ -12,7 +12,7 @@ This library provides the functionality to make async API calls via HTTP / SOAP 
 * Currently supports infinite nested depth of pre and post processors
 * Retry Functionality
 * Exceptions can be contributed in the utilities, and you can use your own exceptions in the circuit breaker config as well.
-* Direct File Upload functionality. ToDo - Multipart(Open for contribution)
+* Direct File Upload functionality.
 
 Params -
 
@@ -159,7 +159,6 @@ await request(
             # optional Include only if you want call api with file. If this is included api body will have only file
             "local_filepath": "required",  # File path to be sent
             "file_key": "required",  # File to be sent on which key in request body
-            "delete_local_file": "boolean Optional"
             # After making API if you want to delete file then add value as True default is false.
         },
         "circuit_breaker_config": {  # Optional
