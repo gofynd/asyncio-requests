@@ -4,7 +4,6 @@ import time
 from typing import Dict, Text, Tuple
 
 import aioftp
-
 from asyncio_requests.helpers.internal.circuit_breaker_helper import \
     CircuitBreakerHelper
 from asyncio_requests.helpers.internal.filters_helper import get_ssl_config
@@ -19,19 +18,22 @@ async def ftp_request(
     """Aioftp Request.
 
     :param url: url of ftp server.
-    :param auth: auth object aiohttp.BasicAuth(username, password) - only basicAuth allowed
+    :param auth: auth object aiohttp.BasicAuth(username, password)
+        only basicAuth allowed
     :param response: Dict object with following parameters url,
     payload, external_call_request_time, text, error_message
     :param info: protocol_info passed in request function
 
-    url = "localhost"
-    auth = aiohttp.BasicAuth("user","password"),
-    protocol = "FTP"
+    url = 'localhost'
+    auth = aiohttp.BasicAuth('user','password'),
+    protocol = 'FTP'
     protocol_info = {
-        "port": 21, # optional ddefault is 21
-        "command": "download", # download, upload, remove
-        "server_path": "", # path from where to get/delete or upload file on server.
-        "client_path": "", # path where file is downloaded/uploaded to.
+        'port': 21, # optional ddefault is 21
+        'command': 'download', # download, upload, remove
+        'server_path': '',
+            # path from where to get/delete or upload file on server.
+        'client_path': '',
+            # path where file is downloaded/uploaded to.
     }
     """
     if info is None:
@@ -40,9 +42,9 @@ async def ftp_request(
     port: int = info.get('port', 21)
     user: Text = auth.login
     password: Text = auth.password
-    command_: Text = info.get("command", None)
-    server_path: Text = info.get("server_path", None)
-    client_path: Text = info.get("client_path", None)
+    command_: Text = info.get('command', None)
+    server_path: Text = info.get('server_path', None)
+    client_path: Text = info.get('client_path', None)
     timeout: int = info.get('timeout', HTTP_TIMEOUT)
     certificate: Tuple[Text] = info.get('certificate', None)
     verify_ssl: bool = info.get('verify_ssl', False)
@@ -59,7 +61,9 @@ async def ftp_request(
 
     try:
         async with aioftp.Client.context(
-            url, port, user, password, ssl=verify_ssl, connection_timeout=timeout
+            url, port, user, password,
+            ssl=verify_ssl,
+            connection_timeout=timeout
         ) as client:
             make_ftp_request = getattr(client, command_.lower())
             if client_path:
