@@ -954,13 +954,125 @@ result = await request(
 * Delete a local file on system
 
 
+## FTP
+
+* Uses aioftp internally to implement FTP/FTPS.
+* Added functionality of circuit breaker, pre and post processor configs same as http.
+* Can Leverage all the ftp commands provided by aioftp library.
+* By Default used FTP protocol can use FTPS if ssl config is enabled.
+
+
+# How to use.
+
+```python
+import aiohttp
+from asyncio_requests.asyncio_request import request
+
+await request(
+    url="Server Ip",  # Ip/url or ftp server <Required>
+    auth=aiohttp.BasicAuth('username', 'password'),  # The username and ip of the ftp server, to be sent as aiohttp.BasicAuth object <Required>
+    protocol="FTP",  # str <Required> (FTP)
+    protocol_info={
+        "port": 21, # default is 21 <Optional>
+        "command": "download", # generic ftp commands like download, upload, remove <Required>
+        "server_path": "/tmp/temp.pdf", # path from where to get/remove or upload file on server.
+        "client_path": "", # path where file is downloaded/uploaded to. <optional>
+        "timeout": 30 # <Optional>
+        "verify_ssl": False # default is False <Optional>
+        "certificate" "" # required if verify_ssl is True
+        "circuit_breaker_config": {  # Optional
+            "maximum_failures": int,  # Optional Failures allowed
+            "timeout": int,  # Optional time in seconds
+            "retry_config": {  # Optional Include this if you want retry calls if failed on first time
+                "name": str,  # Required Any name
+                "allowed_retries": int,  # Required number of retries you want to make
+                "retriable_exceptions": [<callable object>] # Optional
+                "abortable_exceptions": [<callable object>] # Optional
+                "on_retries_exhausted": <callable object>, # Optional callable that will be invoked on a retries exhausted event,
+                "on_failed_attempt": <callable object>, # Optional callable that will be invoked on a failed attempt event,
+                "on_abort": <callable object>, # Optional callable that will be invoked on an abort event,
+            "delay": int, # seconds of delay between retries Optional default 0,
+            "max_delay": int, # seconds of max delay between retries Optional default 0,
+            "jitter": bool # Boolean Optional,
+          }
+      }
+    },
+    pre_processor_config = {  # Optional
+        "function": <callable object>,  # Required function that you want to call before ftp call
+        "params": {  # Optional
+            "param1": "value1" # Params you want to pass in function
+        }
+    },
+    post_processor_config = {  # Optional
+        "function": <callable object>,  # Required function that you want to call after ftp call
+        "params": {
+            "param1": "value1" # Params you want to pass in function
+        }
+    }
+)
+```
+
+# Sample FTP Call.
+
+```python
+import aiohttp
+from asyncio_requests.asyncio_request import request
+from asyncio_requests.utils.http_file_config import download_file_from_url
+
+local_path = "/tmp/temp.png"
+await request(
+    url = "localhost",
+    auth = aiohttp.BasicAuth("use","pswd"),
+    protocol = "FTP",
+    protocol_info = {
+        "port": 21,
+        "command": "upload",
+        "server_path": "/home/resources/logo.png",
+        "client_path": local_path,
+        "circuit_breaker_config": {
+            "timeout": 150,
+            "retry_config": {
+                "name": "api_retry",
+                "allowed_retries": 4
+            }
+        }
+    },
+    pre_processor_config = {
+        "function": download_file_from_s3,
+          "params": {
+            "file_download_path": "https://[bucket_name].s3.amazonaws.com/logo.png",
+            "local_filepath": local_path
+          }
+    }
+)
+
+## Resonse
+"""
+{'api_response': True,
+ 'error_message': '',
+ 'external_call_request_time': '2022-05-13 19:07:35.775706+05:30',
+ 'file': '/home/resources/logo.png',
+ 'file_stats': {'modify': '20220513190700',
+                'size': '29304',
+                'type': 'file',
+                'unix.group': '1000',
+                'unix.links': '1',
+                'unix.mode': 436,
+                'unix.owner': '1000'},
+ 'mode': 'upload',
+ 'payload': {'success': True},
+ 'pre_processor_response': None,
+ 'text': '',
+ 'url': 'localhost'}
+
+"""
+
+```
+
 
 ## SOAP
 (upcoming)
 
-
-## FTP
-(upcoming)
 
 ### Generating Distribution Archives
 
