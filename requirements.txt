@@ -5,3 +5,4 @@ aioboto3==9.3.1
 aiofiles==0.8.0
 pyfailsafe==0.6.0
 pytz==2021.3
+aioftp==0.20.1
