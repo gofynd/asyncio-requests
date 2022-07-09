@@ -24,13 +24,13 @@ setup(
         exclude=('local_development', 'tests*', 'docs')),
     license='MIT',
     install_requires=[
-        'aiohttp==3.8.1',
+        'aiohttp==3.7.4',
         'ujson==5.4.0',
-        'requests==2.28.1',
+        'requests==2.25.0',
         'zeep[async]==4.0.0',
         'aioboto3==9.6.0',
         'aiofiles==0.8.0',
-        'pyfailsafe==0.6.0',
+        'pyfailsafe==0.5.0',
         'pytz==2022.1',
         'aioftp==0.21.2'
     ],
