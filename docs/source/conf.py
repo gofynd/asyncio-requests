@@ -24,7 +24,7 @@ copyright = '2022, Fynd'  # noqa A001
 author = 'Arjunsingh Yadav'
 
 # The full version, including alpha/beta/rc tags
-release = '2.0'
+release = '2.1'
 
 
 # -- General configuration ---------------------------------------------------
