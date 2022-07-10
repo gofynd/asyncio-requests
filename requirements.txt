@@ -6,3 +6,4 @@ aiofiles==0.8.0
 pyfailsafe==0.5.0
 pytz==2022.1
 aioftp==0.21.2
+asyncssh==2.11.0
