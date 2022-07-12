@@ -13,6 +13,5 @@ header_filter_mapping = {
 
 header_response_mapping = {
     'application/json': application_json_response,
-    'application/json; charset=utf-8': application_json_response,
     'default': application_json_response
 }
