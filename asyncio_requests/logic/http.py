@@ -89,7 +89,8 @@ async def http_request(
             response['json'] = ''
             for content_type_value in header_response_mapping.keys():
                 if content_type_value in res_content_type:
-                    response['json'] = await header_response_mapping[content_type_value](response['text'])
+                    response['json'] = await header_response_mapping[
+                        content_type_value](response['text'])
             response['request_tracer'] = [
                 tc.results_collector for tc in trace_config
             ]
