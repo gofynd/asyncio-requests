@@ -19,7 +19,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/gofynd/asyncio-requests',
-    download_url='https://github.com/gofynd/aio-requests/archive/refs/tags/v2.5.tar.gz',  # noqa E251
+    download_url='https://github.com/gofynd/aio-requests/archive/refs/tags/v2.6.tar.gz',  # noqa E251
     packages=find_packages(
         exclude=('local_development', 'tests*', 'docs')),
     license='MIT',
