@@ -12,7 +12,7 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='asyncio-requests',
-    version='2.5',
+    version='2.6',
     author='Arjunsingh Yadav, Manish Magnani, Devesh Ratthour',
     author_email='arjunsinghyadav@fynd.com, manishmagnani@gofynd.com',
     description=description,
