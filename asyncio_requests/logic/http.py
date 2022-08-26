@@ -94,6 +94,7 @@ async def http_request(
             response['request_tracer'] = [
                 tc.results_collector for tc in trace_config
             ]
+            response['latency'] = (time.time() - start_time)
         except Exception as request_error:
             response['status_code'] = 999
             response['latency'] = (time.time() - start_time)
