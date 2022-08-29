@@ -29,7 +29,7 @@ setup(
         'requests>=2.25.0',
         'zeep[async]==4.0.0',
         'aioboto3==8.0.5',
-        'aiofiles==0.8.0',
+        'aiofiles>=0.6.0',
         'pyfailsafe==0.6.0',
         'pytz==2022.1',
         'aioftp==0.21.2',
