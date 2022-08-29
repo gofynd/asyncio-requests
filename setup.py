@@ -12,24 +12,24 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='asyncio-requests',
-    version='2.7',
+    version='2.7.1',
     author='Arjunsingh Yadav, Manish Magnani, Devesh Ratthour',
     author_email='arjunsinghyadav@fynd.com, manishmagnani@gofynd.com',
     description=description,
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/gofynd/asyncio-requests',
-    download_url='https://github.com/gofynd/aio-requests/archive/refs/tags/v2.7.tar.gz',  # noqa E251
+    download_url='https://github.com/gofynd/aio-requests/archive/refs/tags/v2.7.1.tar.gz',  # noqa E251
     packages=find_packages(
         exclude=('local_development', 'tests*', 'docs')),
     license='MIT',
     install_requires=[
-        'aiohttp==3.8.1',
-        'ujson==5.4.0',
-        'requests==2.28.1',
+        'aiohttp>=3.7.3',
+        'ujson>=4.0.1',
+        'requests>=2.25.0',
         'zeep[async]==4.0.0',
         'aioboto3==8.0.5',
-        'aiofiles==0.8.0',
+        'aiofiles>=0.6.0',
         'pyfailsafe==0.6.0',
         'pytz==2022.1',
         'aioftp==0.21.2',
