@@ -1,5 +1,6 @@
 aiohttp~=3.7.3
-ujson==4.0.1
+pyproject-toml==0.0.10
+ujson~=4.0.1
 requests~=2.25.0
 aioboto3==8.0.5
 aiofiles~=0.6.0

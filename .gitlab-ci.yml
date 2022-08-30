@@ -9,7 +9,7 @@ image: "python:3.10-slim-buster"
     - chmod 700 ~/.ssh
     - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    - pip install --upgrade pip==22.2.2
+    - pip install --upgrade pip==22.0.3
     - pip install -r "https://gitlab.com/api/v4/projects/33941878/repository/files/requirements-dev.txt/raw?ref=main"
     - git config --global user.email "arjunsinghyadav@gofynd.com"
     - git config --global user.name "Arjunsingh Yadav"
