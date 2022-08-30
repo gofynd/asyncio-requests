@@ -4,6 +4,7 @@ image: "python:3.10-slim-buster"
   before_script:
     - set -x
     - python --version
+    - apt-get update && apt-get -y install gcc mono-mcs && rm -rf /var/lib/apt/lists/*
     - apt-get update -y -qq && apt-get install -y -qq git make openssh-client
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
