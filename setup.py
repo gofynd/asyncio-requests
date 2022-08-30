@@ -25,7 +25,7 @@ setup(
     license='MIT',
     install_requires=[
         'aiohttp>=3.7.3',
-        'ujson>=4.0.1',
+        'ujson>=5.4.0',
         'requests>=2.25.0',
         'zeep[async]==4.0.0',
         'aioboto3==8.0.5',
