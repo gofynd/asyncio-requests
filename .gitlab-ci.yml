@@ -4,7 +4,7 @@ image: "python:3.10-slim-buster"
   before_script:
     - set -x
     - python --version
-    - apt-get update -y -qq && apt-get install -y -qq git make openssh-client
+    - apt-get update -y -qq && apt-get install -y -qq git make openssh-client g++
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts
