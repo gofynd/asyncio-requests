@@ -49,7 +49,7 @@ async def make_http_request(
     :param request_type - type of request
     """
     response = kwargs.get('response', {})
-
+    http_file_download_config = kwargs.get('http_file_download_config')
     ssl_filters: Dict = await get_ssl_config(
         certificate=kwargs.get('certificate'),
         verify_ssl=kwargs.get('verify_ssl'))
@@ -63,6 +63,10 @@ async def make_http_request(
         response['headers'] = dict(resp.headers)
         response['cookies'] = dict(resp.cookies)
 
+        if http_file_download_config:
+            with open(http_file_download_config.get('download_filepath'), 'wb') as file:
+                async for chunk in resp.content.iter_chunked(http_file_download_config.get('chunk_size')):
+                    file.write(chunk)
         try:
             response['content'] = await resp.content.read()
             # resp.content is a StreamReader
@@ -72,3 +76,11 @@ async def make_http_request(
                 f'Error occurred while converting bytes to string - {err}'
 
     return response
+
+
+async def file_sender(file_name=None, chunk_size=1024):
+    async with aiofiles.open(file_name, 'rb') as f:
+        chunk = await f.read(chunk_size)
+        while chunk:
+            yield chunk
+            chunk = await f.read(chunk_size)

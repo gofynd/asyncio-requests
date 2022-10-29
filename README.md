@@ -159,8 +159,13 @@ await request(
             # optional Include only if you want call api with file. If this is included api body will have only file
             "local_filepath": "required",  # File path to be sent
             "file_key": "required",  # File to be sent on which key in request body
+            "chunk_size": "optional" # size of stream if streaming upload is required
             # After making API if you want to delete file then add value as True default is false.
         },
+        "http_file_download_config": {
+          "download_filepath": "required" # In case file downloads, location to which file is stored
+          "chunk_size": "optional" # chunk size of a stream.
+        }
         "circuit_breaker_config": {  # Optional
             "maximum_failures": int,  # Optional Failures allowed
             "timeout": int,  # Optional time in seconds
