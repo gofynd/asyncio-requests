@@ -8,7 +8,8 @@ from asyncio_requests.helpers.internal import header_filter_mapping
 from asyncio_requests.helpers.internal import header_response_mapping
 from asyncio_requests.helpers.internal.circuit_breaker_helper import \
     CircuitBreakerHelper
-from asyncio_requests.helpers.internal.request_helper import file_sender, make_http_request
+from asyncio_requests.helpers.internal.request_helper import \
+    file_sender, make_http_request
 from asyncio_requests.utils.constants import HTTP_TIMEOUT
 from asyncio_requests.utils.request_tracer import request_tracer
 import ujson
@@ -56,7 +57,7 @@ async def http_request(
             timeout=timeout, auth=auth, json_serialize=serialization
     ) as session:
         try:
-            if http_file_config and not http_file_config.get("chunk_size"):
+            if http_file_config and not http_file_config.get('chunk_size'):
                 with open(http_file_config['local_filepath'], 'rb') as \
                         read_file:
                     filters = {
@@ -73,8 +74,9 @@ async def http_request(
                         http_file_download_config=http_file_download_config)
             elif http_file_config and http_file_config.get('chunk_size'):
                 filters = {
-                    'data': file_sender(file_name=http_file_config['local_filepath'],
-                                        chunk_size=http_file_config['chunk_size'])
+                    'data': file_sender(
+                        file_name=http_file_config['local_filepath'],
+                        chunk_size=http_file_config['chunk_size'])
                 }
                 response: Dict = await circuit_breaker.failsafe.run(
                     make_http_request,

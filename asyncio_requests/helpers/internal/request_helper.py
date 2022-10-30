@@ -64,8 +64,12 @@ async def make_http_request(
         response['cookies'] = dict(resp.cookies)
 
         if http_file_download_config:
-            with open(http_file_download_config.get('download_filepath'), 'wb') as file:
-                async for chunk in resp.content.iter_chunked(http_file_download_config.get('chunk_size')):
+            with open(
+                http_file_download_config.get('download_filepath'), 'wb'
+            )as file:
+                async for chunk in resp.content.iter_chunked(
+                    http_file_download_config.get('chunk_size')
+                ):
                     file.write(chunk)
         try:
             response['content'] = await resp.content.read()
@@ -79,6 +83,7 @@ async def make_http_request(
 
 
 async def file_sender(file_name=None, chunk_size=1024):
+    """Generates the chunk of file in a file stream."""
     async with aiofiles.open(file_name, 'rb') as f:
         chunk = await f.read(chunk_size)
         while chunk:
