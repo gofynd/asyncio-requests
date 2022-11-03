@@ -33,7 +33,7 @@ async def request(
         "headers": {}, #Optional,
         "trace_config": request tracer object list,
             #Optional default is [aiohttp.TraceConfig()]
-        "http_file_config" {
+        "http_file_upload_config" {
             "local_filepath": "required",
             "file_key": "required",
             "delete_local_file": "boolean Optional"

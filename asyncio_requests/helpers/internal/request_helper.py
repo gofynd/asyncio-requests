@@ -6,6 +6,7 @@ import aiofiles
 import aiohttp
 from asyncio_requests.helpers.common.file_helper import download_file_from_s3
 from asyncio_requests.helpers.internal.filters_helper import get_ssl_config
+from asyncio_requests.utils.constants import CHUNK_SIZE_CONSTANT
 
 
 async def fetch_file(file_config: Dict):
@@ -33,6 +34,17 @@ async def fetch_file(file_config: Dict):
                 async with aiofiles.open(
                         file_config['local_filepath'], 'wb') as file_obj:
                     await file_obj.write(contents)
+
+
+async def file_upload(
+        file_name=None,
+        file_upload_chunk_size=CHUNK_SIZE_CONSTANT):
+    """Generates the chunk of file in a file stream."""
+    async with aiofiles.open(file_name, 'rb') as f:
+        chunk = await f.read(file_upload_chunk_size)
+        while chunk:
+            yield chunk
+            chunk = await f.read(file_upload_chunk_size)
 
 
 async def make_http_request(
@@ -68,7 +80,7 @@ async def make_http_request(
                 http_file_download_config.get('download_filepath'), 'wb'
             )as file:
                 async for chunk in resp.content.iter_chunked(
-                    http_file_download_config.get('chunk_size')
+                    http_file_download_config.get('file_download_chunk_size')
                 ):
                     file.write(chunk)
         try:
@@ -80,12 +92,3 @@ async def make_http_request(
                 f'Error occurred while converting bytes to string - {err}'
 
     return response
-
-
-async def file_sender(file_name=None, chunk_size=1024):
-    """Generates the chunk of file in a file stream."""
-    async with aiofiles.open(file_name, 'rb') as f:
-        chunk = await f.read(chunk_size)
-        while chunk:
-            yield chunk
-            chunk = await f.read(chunk_size)

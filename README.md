@@ -90,7 +90,7 @@ Params -
           <li>headers -      Dict. Required</li>
           <li>trace_config - List[tracer_callable_object] Optional. default tracer is aiohttp.TraceConfig() - Optional</li>
           <li>
-            http_file_config: Dict use this only if you want to send file in request. If you use this config then only file will be sent in request - Optional
+            http_file_upload_config: Dict use this only if you want to send file in request. If you use this config then only file will be sent in request - Optional
             <ul>
               <li>local_filepath: machine file path for file to be sent in request</li>
               <li>file_key: The key in which the file data is to be sent</li>
@@ -155,16 +155,16 @@ await request(
         "verify_ssl": True,  # Boolean <Optional>,
         "cookies": "",  # str <Optional>,
         "headers": {},  # dict <Optional>,
-        "http_file_config": {
+        "http_file_upload_config": {
             # optional Include only if you want call api with file. If this is included api body will have only file
             "local_filepath": "required",  # File path to be sent
             "file_key": "required",  # File to be sent on which key in request body
-            "chunk_size": "optional" # size of stream if streaming upload is required
+            "file_upload_chunk_size": "optional" # size of stream if streaming upload is required
             # After making API if you want to delete file then add value as True default is false.
         },
         "http_file_download_config": {
           "download_filepath": "required" # In case file downloads, location to which file is stored
-          "chunk_size": "optional" # chunk size of a stream.
+          "file_download_chunk_size": "optional" # chunk size of a stream.
         }
         "circuit_breaker_config": {  # Optional
             "maximum_failures": int,  # Optional Failures allowed
@@ -878,7 +878,7 @@ result = await request(
 
 ```python
 from asyncio_requests.asyncio_request import request
-from asyncio_requests.utils.http_file_config import download_file_from_url, delete_local_file_path
+from asyncio_requests.utils.http_file_upload_config import download_file_from_url, delete_local_file_path
 
 
 local_file_path = "/tmp/test.pdf"
@@ -887,7 +887,7 @@ result = await request(
     protocol="HTTPS",
     protocol_info={
         "request_type": "POST",
-        "http_file_config": {
+        "http_file_upload_config": {
             "local_filepath": local_file_path,
             "file_key": "file"
         }
@@ -1022,7 +1022,7 @@ await request(
 ```python
 import aiohttp
 from asyncio_requests.asyncio_request import request
-from asyncio_requests.utils.http_file_config import download_file_from_url
+from asyncio_requests.utils.http_file_upload_config import download_file_from_url
 
 local_path = "/tmp/temp.png"
 await request(

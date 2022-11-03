@@ -9,7 +9,7 @@ from asyncio_requests.helpers.internal import header_response_mapping
 from asyncio_requests.helpers.internal.circuit_breaker_helper import \
     CircuitBreakerHelper
 from asyncio_requests.helpers.internal.request_helper import \
-    file_sender, make_http_request
+    file_upload, make_http_request
 from asyncio_requests.utils.constants import HTTP_TIMEOUT
 from asyncio_requests.utils.request_tracer import request_tracer
 import ujson
@@ -39,8 +39,8 @@ async def http_request(
     headers: Dict = info.get('headers', {})
     trace_config: List[aiohttp.TraceConfig()] = info.get(
         'trace_config', [request_tracer()])
-    http_file_config: Dict = info.get('http_file_config', {})
-    http_file_download_config: Dict = info.get('http_file_download_config', {})
+    http_file_upload_config: Dict = info.get('http_file_upload_config', {})
+    file_download_config: Dict = info.get('http_file_download_config', {})
     serialization: Callable = info.get('serialization', ujson.dumps)
     circuit_breaker_config: Dict = info.get('circuit_breaker_config', {})
 
@@ -57,11 +57,15 @@ async def http_request(
             timeout=timeout, auth=auth, json_serialize=serialization
     ) as session:
         try:
-            if http_file_config and not http_file_config.get('chunk_size'):
-                with open(http_file_config['local_filepath'], 'rb') as \
-                        read_file:
+            if http_file_upload_config:
+                if http_file_upload_config.get('file_upload_chunk_size'):
+                    local_filepath = http_file_upload_config['local_filepath']
+                    chunk_size = http_file_upload_config[
+                        'file_upload_chunk_size']
                     filters = {
-                        'data': {http_file_config['file_key']: read_file}
+                        'data': file_upload(
+                            file_name=local_filepath,
+                            file_upload_chunk_size=chunk_size)
                     }
                     response: Dict = await circuit_breaker.failsafe.run(
                         make_http_request,
@@ -71,22 +75,23 @@ async def http_request(
                         request_type,
                         certificate=certificate,
                         verify_ssl=verify_ssl,
-                        http_file_download_config=http_file_download_config)
-            elif http_file_config and http_file_config.get('chunk_size'):
-                filters = {
-                    'data': file_sender(
-                        file_name=http_file_config['local_filepath'],
-                        chunk_size=http_file_config['chunk_size'])
-                }
-                response: Dict = await circuit_breaker.failsafe.run(
-                    make_http_request,
-                    session,
-                    url,
-                    filters,
-                    request_type,
-                    certificate=certificate,
-                    verify_ssl=verify_ssl,
-                    http_file_download_config=http_file_download_config)
+                        http_file_download_config=file_download_config)
+                else:
+                    with open(http_file_upload_config['local_filepath'],
+                              'rb') as read_file:
+                        filters = {
+                            'data': {
+                                http_file_upload_config['file_key']: read_file}
+                        }
+                        response: Dict = await circuit_breaker.failsafe.run(
+                            make_http_request,
+                            session,
+                            url,
+                            filters,
+                            request_type,
+                            certificate=certificate,
+                            verify_ssl=verify_ssl,
+                            http_file_download_config=file_download_config)
             else:
                 content_type = headers.get('Content-Type', 'default').lower()
                 filters = await header_filter_mapping.get(
@@ -102,7 +107,7 @@ async def http_request(
                     request_type,
                     certificate=certificate,
                     verify_ssl=verify_ssl,
-                    http_file_download_config=http_file_download_config)
+                    http_file_download_config=file_download_config)
             res_content_type: Text = response['headers'].get(
                 'Content-Type', 'default').lower()
             response['json'] = ''

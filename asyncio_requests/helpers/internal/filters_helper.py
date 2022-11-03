@@ -57,9 +57,9 @@ async def application_json_filters(
     """
     filters = {}
     request_type: Text = kwargs['request_type']
-    http_file_config: Dict = kwargs.get('http_file_config')
+    http_file_upload_config: Dict = kwargs.get('http_file_upload_config')
     if request_type == 'GET':
-        if http_file_config:
+        if http_file_upload_config:
             pass
         else:
             if isinstance(data, dict):
