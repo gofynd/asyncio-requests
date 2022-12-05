@@ -4,12 +4,11 @@ import time
 from typing import Any, Callable, Dict, List, Text, Tuple
 
 import aiohttp
-from asyncio_requests.helpers.internal import header_filter_mapping
 from asyncio_requests.helpers.internal import header_response_mapping
 from asyncio_requests.helpers.internal.circuit_breaker_helper import \
     CircuitBreakerHelper
 from asyncio_requests.helpers.internal.request_helper import \
-    file_upload, make_http_request
+    handle_http_request
 from asyncio_requests.utils.constants import HTTP_TIMEOUT
 from asyncio_requests.utils.request_tracer import request_tracer
 import ujson
@@ -57,57 +56,18 @@ async def http_request(
             timeout=timeout, auth=auth, json_serialize=serialization
     ) as session:
         try:
-            if http_file_upload_config:
-                if http_file_upload_config.get('file_upload_chunk_size'):
-                    local_filepath = http_file_upload_config['local_filepath']
-                    chunk_size = http_file_upload_config[
-                        'file_upload_chunk_size']
-                    filters = {
-                        'data': file_upload(
-                            file_name=local_filepath,
-                            file_upload_chunk_size=chunk_size)
-                    }
-                    response: Dict = await circuit_breaker.failsafe.run(
-                        make_http_request,
-                        session,
-                        url,
-                        filters,
-                        request_type,
-                        certificate=certificate,
-                        verify_ssl=verify_ssl,
-                        http_file_download_config=file_download_config)
-                else:
-                    with open(http_file_upload_config['local_filepath'],
-                              'rb') as read_file:
-                        filters = {
-                            'data': {
-                                http_file_upload_config['file_key']: read_file}
-                        }
-                        response: Dict = await circuit_breaker.failsafe.run(
-                            make_http_request,
-                            session,
-                            url,
-                            filters,
-                            request_type,
-                            certificate=certificate,
-                            verify_ssl=verify_ssl,
-                            http_file_download_config=file_download_config)
-            else:
-                content_type = headers.get('Content-Type', 'default').lower()
-                filters = await header_filter_mapping.get(
-                    content_type)(
-                    response['payload'],
-                    request_type=request_type
-                )
-                response: Dict = await circuit_breaker.failsafe.run(
-                    make_http_request,
-                    session,
-                    url,
-                    filters,
-                    request_type,
-                    certificate=certificate,
-                    verify_ssl=verify_ssl,
-                    http_file_download_config=file_download_config)
+            response = await handle_http_request(
+                session,
+                url,
+                request_type,
+                circuit_breaker,
+                headers=headers,
+                payload=response['payload'],
+                certificate=certificate,
+                verify_ssl=verify_ssl,
+                http_file_download_config=file_download_config,
+                http_file_upload_config=http_file_upload_config,
+            )
             res_content_type: Text = response['headers'].get(
                 'Content-Type', 'default').lower()
             response['json'] = ''
