@@ -1,4 +1,4 @@
-'''Request Helper.'''
+"""Request Helper."""
 
 from typing import Dict, Text
 
@@ -11,13 +11,13 @@ from asyncio_requests.utils.constants import CHUNK_SIZE_CONSTANT
 
 
 async def fetch_file(file_config: Dict):
-    '''Download file from s3 or from given link or.
+    """Download file from s3 or from given link or.
 
     just read from the local pod file path.
     :param file_config: Dict contains s3 config,
     download link, local filepath etc.
     file_config[local_filepath] is mandatory
-    '''
+    """
     if file_config.get('s3_config'):
         await download_file_from_s3(
             file_config['local_filepath'],
@@ -40,7 +40,7 @@ async def fetch_file(file_config: Dict):
 async def file_upload(
         file_name=None,
         file_upload_chunk_size=CHUNK_SIZE_CONSTANT):
-    '''Generates the chunk of file in a file stream.'''
+    """Generates the chunk of file in a file stream."""
     async with aiofiles.open(file_name, 'rb') as f:
         chunk = await f.read(file_upload_chunk_size)
         while chunk:
@@ -54,13 +54,13 @@ async def make_http_request(
         filters: Dict,
         request_type: Text,
         **kwargs) -> Dict:
-    '''Make the API call.
+    """Make the API call.
 
     :param session - Sqlalchemy session object
     :param url - url to hit the api
     :param filters - filters to include in the api
     :param request_type - type of request
-    '''
+    """
     response = kwargs.get('response', {})
     http_file_download_config = kwargs.get('http_file_download_config')
     ssl_filters: Dict = await get_ssl_config(
@@ -102,6 +102,13 @@ async def make_http_filters_with_stream_file_upload(
     circuit_breaker,
     **kwargs
 ) -> Dict:
+    """Make filters for http call involving file upload in chunks.
+
+    :param session - aiohttp.ClientSession session object
+    :param url - url to hit the api
+    :param request_type - type of request
+    :param circuit_breaker - circuit breaker object.
+    """
     http_file_upload_config = kwargs.get('http_file_upload_config')
     local_filepath = http_file_upload_config['local_filepath']
     chunk_size = http_file_upload_config[
@@ -127,9 +134,15 @@ async def make_http_filters_without_stream_uploads(
     circuit_breaker,
     **kwargs
 ) -> Dict:
+    """Make filters for file upload over http.
+
+    :param session - aiohttp.ClientSession session object
+    :param url - url to hit the api
+    :param request_type - type of request
+    :param circuit_breaker - circuit breaker object.
+    """
     http_file_upload_config = kwargs.get('http_file_upload_config')
-    with open(http_file_upload_config['local_filepath'],
-            'rb') as read_file:
+    with open(http_file_upload_config['local_filepath'], 'rb') as read_file:
         filters = {
             'data': {
                 http_file_upload_config['file_key']: read_file}
@@ -151,6 +164,13 @@ async def make_http_filters_without_file(
     circuit_breaker,
     **kwargs
 ) -> Dict:
+    """Make filters to make http call.
+
+    :param session - aiohttp.ClientSession session object
+    :param url - url to hit the api
+    :param request_type - type of request
+    :param circuit_breaker - circuit breaker object.
+    """
     headers = kwargs.get('headers')
     payload = kwargs.get('payload')
     content_type = headers.get('Content-Type', 'default').lower()
@@ -169,9 +189,9 @@ async def make_http_filters_without_file(
 
 
 filter_methods = {
-    'make_http_filters_with_stream_file_upload': make_http_filters_with_stream_file_upload,
-    'make_http_filters_without_stream_uploads': make_http_filters_without_stream_uploads,
-    'make_http_filters_without_file': make_http_filters_without_file
+    'http_with_stream_file_upload': make_http_filters_with_stream_file_upload,
+    'http_without_stream_uploads': make_http_filters_without_stream_uploads,
+    'http_filters_without_file': make_http_filters_without_file
 }
 
 
@@ -182,14 +202,21 @@ async def handle_http_request(
     circuit_breaker: object,
     **kwargs
 ) -> Dict:
+    """Identify filter metods to be called before http request.
+
+    :param session - aiohttp.ClientSession session object
+    :param url - url to hit the api
+    :param request_type - type of request
+    :param circuit_breaker - circuit breaker object.
+    """
     http_file_upload_config = kwargs.get('http_file_upload_config')
     if http_file_upload_config:
         if http_file_upload_config.get('file_upload_chunk_size'):
-            filter_method = filter_methods.get('make_http_filters_with_stream_file_upload')
+            filter_method = filter_methods.get('http_with_stream_file_upload')
         else:
-            filter_method = filter_methods.get('make_http_filters_without_stream_uploads')
+            filter_method = filter_methods.get('http_without_stream_uploads')
     else:
-        filter_method = filter_methods.get('make_http_filters_without_file')
+        filter_method = filter_methods.get('http_filters_without_file')
 
     return await filter_method(
         session,
