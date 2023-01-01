@@ -48,6 +48,33 @@ async def file_upload(
             chunk = await f.read(file_upload_chunk_size)
 
 
+async def handle_multipart_response(
+    resp: aiohttp.ClientResponse, http_file_download_config: dict
+) -> str:
+    """Iter multipart responses.
+    
+    this function handles multipart responses sent by server,
+    by reading the chunks of data and terminates when eof is reached.
+    The response is saved in the file path of http_file_download_config
+    else in response file of the current path.
+    :param resp - response object of aiohttp.
+    :param http_file_download_config - file download config
+    containing the file download location."""
+    reader = aiohttp.MultipartReader.from_response(resp)
+    response_file_name = http_file_download_config.get('download_filepath', 'response.txt') if \
+        http_file_download_config else 'response.txt'
+    response_data = ''
+    with open(response_file_name,'w') as response_file:
+        while True:
+            if reader.at_eof():
+                break
+            part = await reader.next()
+            data = await part.read_chunk()
+            response_data = response_data + str(data)
+            response_file.write(str(data))
+    return response_data
+
+
 async def make_http_request(
         session,
         url: Text,
@@ -76,7 +103,18 @@ async def make_http_request(
         response['headers'] = dict(resp.headers)
         response['cookies'] = dict(resp.cookies)
 
-        if http_file_download_config:
+        content_type = str(response['headers'].get('content-type'))
+
+        # handling multipart response.
+        if content_type.startswith('multipart'):
+            response['content'] = await handle_multipart_response(
+                resp,
+                http_file_download_config
+            )
+            response['text'] = response['content']
+            return response
+
+        elif http_file_download_config:
             with open(
                 http_file_download_config.get('download_filepath'), 'wb'
             )as read_file:
