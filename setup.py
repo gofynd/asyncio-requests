@@ -14,7 +14,6 @@ setup(
     name='asyncio-requests',
     version='2.7.3',
     author='Arjunsingh Yadav, Manish Magnani, Devesh Ratthour',
-    author_email='arjunsinghyadav@fynd.com, manishmagnani@gofynd.com',
     description=description,
     long_description=long_description,
     long_description_content_type='text/markdown',
